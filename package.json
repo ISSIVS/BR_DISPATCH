@@ -1,0 +1,19 @@
+{
+  "name": "eventviewerhtml5",
+  "version": "1.0.0",
+  "description": "EventViewer SecurOS 10.8",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-windows": "^1.0.0-beta.5",
+    "nodemailer": "^6.5.0",
+    "pg": "^8.5.1",
+    "request": "^2.88.2",
+    "socket.io": "^4.0.1"
+  }
+}

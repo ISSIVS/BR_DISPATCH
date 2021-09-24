@@ -1,0 +1,491 @@
+<html>
+<head> 
+     
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <script src="socket.io/socket.io.js"></script>
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+      <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+      <link rel="stylesheet" href="bower_components/bootstrap-daterangepicker/daterangepicker.css">
+      <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css">
+      <link rel="stylesheet" href="css/cssadittional.css">
+       <meta charset="utf-8">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+      <link rel="stylesheet" href="css/css.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <title>SecurOS - Simplified Dispatcher Module</title>
+</head>
+<body>
+<!-- navbar SecurOS-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-securos">
+    <a class="navbar-brand" href="#">
+        <img src="images/logos securOS__S.png" width="30" height="30" alt="">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#" onclick="incidents()"><i class="fa fa-list-ul" aria-hidden="true"></i> Incidents <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="directory()"><i class="fa fa-address-book" aria-hidden="true"></i> Directory</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="report()"><i class="fa fa-download" aria-hidden="true"></i> Reports</a>
+          </li>
+        </ul>
+       <span class="navbar-text activeIncidents" id='activeIncidents'></span>  <span class="navbar-text user" style="color:rgba(255,255,255,0.5)" id="test" > External User</span>
+    </div>
+</nav>
+
+<!-- INCIDENTS TAB-->
+<div class="row incidents" id="incidents">
+    <!-- Filter by name -->
+    <div class="col-md-3 filters" id="filters">
+      <input type="text" style="width: 100%" id="filterbyname" onkeyup="filterByName()" placeholder="Filter by camera name..." title="Type in a name">
+    </div>
+    <!-- Filter by incident -->
+    <div class="col-md-3 filters" id="filters">
+                    <select class="selectpicker select"  multiple data-live-search="true"  onchange="filterByIncident(this)" style="width: 100%;" tabindex="-1" aria-hidden="true" id="filterbyincident">
+                      <option value="MD_START">Motion detection start</option>
+                      <option value="MD_STOP">Motion detection stop</option>
+                      <option value="ARMED">Camera armed</option>
+                      <option value="DISARMED">Camera disarmed</option>
+                      <option value="ATTACH">Camera connected</option>
+                      <option value="DETACH">Camera disconnected</option>
+                      <option value="REC">Camera recording</option>
+                      <option value="REC_ERROR">Camera recording error</option>
+                      <option value="REC_STOP">Camera recording stop</option>
+                      <option value="VCA_EVENT">Video analytic event</option>
+                    </select>
+              
+    </div>
+    <!-- Filter by State -->
+    <div class="col-md-3 filters" id="filters">
+     <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" onchange="filterByState(this)" data-select2-id="0" tabindex="-1" aria-hidden="true" id="filterbystate">
+                      <option selected="selected" value="All">All states</option>
+                      <option value="New">New</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+    </div>
+    <!-- main table -->
+    <div class="col-md-12 " id="tablediv">
+      <table id="table" class="table table-incidents table-hover tablediv table-condensed table-dark table-responsive-md">
+        <thead>
+          <tr class="clickable-row">
+            <th data-field="id" width="100px">ID</th>
+            <th data-field="name" >Camera name</th>
+            <th data-field="name" >Incident</th>
+            <th data-field="time" >Incident Time</th>
+            <th data-field="state">State</th>
+            <th data-field="operator">Operator</th>
+            <th data-field="response_time">Response Time</th>
+            <th data-field="resolution_time">Resolution Time</th>
+            <th hidden="true" data-field="action">Action</th>
+          </tr>
+        </thead>
+        <tbody id = 'rows'>
+        </tbody>
+      </table>
+    </div>
+     <div class="col-md-3 hidden" id="incidentCard" >
+      <div class='card'id="incidentCards" >
+        <div class="row">
+          <!-- Title -->
+          <div class="col card-title">
+            <h5>Incident <span  id="card_title"></span></h5>
+          </div>
+          <!-- Close button -->
+          <div class="col">
+            <button type="button" class="close" aria-label="Close">
+              <span aria-hidden="true" class="closeCard">&times;</span>
+            </button>
+          </div>
+        </div>
+        <!-- Items  Inicident card-->
+        <!-- Date-->
+        <div class="row incident-item">
+          <div class="col-md-6"><span class="align-top incident-head" >Date:</span></div>
+          <div class="col-md-6"> <span class="align-top" id="card_incidentDate"></span></div>
+        </div>
+        <!-- Time-->
+        <div class="row incident-item">
+            <div class="col-md-6"><span class="align-top incident-head" >Time:</span></div>
+            <div class="col-md-6"> <span class="align-top" id="card_incidentTime"></span></div>
+        </div>
+        <!-- Location-->
+        <div class="row incident-item">
+            <div class="col-md-6"><span class="align-top incident-head" >Location: </span></div>
+            <div class="col-md-6"> <span class="align-top" id="card_location"></span></div>
+        </div>
+        <!-- Camera name-->
+        <div class="row incident-item">
+            <div class="col-md-6"><span class="align-top incident-head">Camera:</span></div>
+            <div class="col-md-6"> <span class="align-top"  id="card_camera"></span></div>
+        </div>
+        <!-- Camera ID-->
+        <div class="row incident-item hidden">
+            <div class="col-md-6"><span class="align-top incident-head">id:</span></div>
+            <div class="col-md-6"> <span class="align-top"  id="card_id"></span></div>
+        </div>
+        <!-- State-->
+        <div class="row incident-item">
+            <div class="col-md-6"><span class="align-top incident-head">State:</span></div>
+            <div class="col-md-6"> <span class="align-top"  id="card_state">New</span></div>
+        </div>
+        <!-- Priority-->
+        <div class="row incident-item">
+          <div class="col-md-6"><span class="align-top incident-head" >Priority:</span></div>
+          <div class="col-md-6"> <span class="align-top" id="card_priority">Medium</span></div>
+        </div>
+        <!-- Procedure-->
+        <div class="row incident-item">
+          <div class="col-md-6"><span class="align-top incident-head" ><div class="btn-group dropleft">
+              <button class="btn btn-secondary btn-sm  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Procedure
+              </button>
+              <div class="dropdown-menu">
+                   <a class="dropdown-item" href="#">Started monitoring the incident</a>
+                    <a class="dropdown-item" href="#">Stopped monitoring the incident</a>
+                     <a class="dropdown-item" href="#">Escalated issue to supervisor</a>
+                      <a class="dropdown-item" href="#">Called local site security personnel</a>
+                       <a class="dropdown-item" href="#">Called central monitoring security personnel</a>
+                       <a class="dropdown-item" href="#">Called 911</a>
+                       <a class="dropdown-item" href="#">Called maintenance to look at camera related issue</a>
+
+              </div>
+            </div></span></div>
+          <div class="col-md-6"> <span class="align-top" id="card_procedure"><!-- Small button groups (default and split) -->
+            
+          </span>
+          </div>
+        </div>
+          <!-- Comments-->
+        <div class="row incident-item">
+             <div class="col-md-12"><span class="align-top incident-head">Comment: </span></div>
+             <div class="col-md-12"><textarea class="form-control" id="card_comment" rows="2"></textarea></div>
+        </div>
+        <!-- INCIDENTS BUTTONS -->
+        <div class="row">
+            <div class="col-md-12 ">
+                <div class="btn-group">
+                  <button class="btn btn-success  " onclick="play()" type="button">Play  <i class="fa fa-play"></i>
+                  </button>
+                  <button class="btn btn-primary " onclick="live()" type="button">Live <i class="fa fa-video-camera" aria-hidden="true"></i>
+                  </button>
+                  <div class="btn-group dropleft">
+                  <button class="btn btn-info  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions
+                  </button>
+                      <ul class="dropdown-menu">
+                          <a class="dropdown-item" href="#">Transfer</a> 
+                          <a class="dropdown-item" href="#">Export Evidence</a> 
+                          <!-- Submenu Priority -->
+                          <div class="dropdown-divider"></div>
+                         
+                          <a class="dropdown-menu  dropdown-toggle"  href="#" data-toggle="dropdown">Change Priority</a>
+                          <div class="dropdown-submenu">
+                              <a  class="dropdown-item" href="#">Low Priority</a>
+                              <a  class="dropdown-item"href="#">Medium Priority</a>
+                              <a  class="dropdown-item"href="#">High Priority</a>
+                          </div>
+                         
+                          <!-- Submenu State -->
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown"  >Change State</a>
+                          <div class="dropdown-submenu">
+                              <a class="dropdown-item" href="#">In Progress</a>
+                              <a class="dropdown-item"href="#">Resolved</a>
+                              <a class="dropdown-item"href="#">Closed</a>
+                              <div class="dropdown-divider"></div>
+                              <a class="dropdown-item"href="#">False Alarm</a>
+                          </div>
+                      </ul>
+                  </div><!--  btn-group dropleft -->
+                </div>
+               </div>
+             </div>
+           </div>
+                   <!-- TRANSFER CARD -->
+      
+      <div class='card hidden' id="transferCard">
+        <div class="row">
+          <!-- Title-->
+          <div class="col card-title">
+            <h5>Transfer <span  id="card_title"></span></h5>
+          </div>
+          <!-- Close Button-->
+          <div class="col">
+            <button type="button" class="close" aria-label="Close">
+                <span aria-hidden="true" class="closeCardTransfer">&times;</span>
+            </button>
+          </div>
+        </div>
+        <!-- Transfer To Lable-->
+        <div class="row transfer-item">
+          <div class="col-md-6"><span class="align-top incident-head" >To:</span></div>
+        </div>
+        <!-- Transfer To Selection Dropdown-->
+        <div class="row incident-item">
+          <div class="col-md-12">
+            <select id="to" name="to" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref" placeholder="to">
+                <option selected value="">Select</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Transfer Button -->
+        <div class="row incident-item">
+          <div class="col-md-12">
+              <button type="submit" onclick="send_transfer()"  class="btn btn-success">Send</button>
+          </div>
+        </div>
+      </div><!--  end transferCard-->
+
+      <!-- Export CARD -->
+      
+      <div class='card hidden' id="exportCard">
+        <div class="row">
+          <!-- Title-->
+          <div class="col card-title">
+            <h5>Export evidence <span  id="card_title"></span></h5>
+          </div>
+          <!-- Close Button-->
+          <div class="col">
+            <button type="button" class="close" aria-label="Close">
+                <span aria-hidden="true" class="closeCardExport">&times;</span>
+            </button>
+          </div>
+        </div>
+        <!-- Export time Lable-->
+        <div class="row transfer-item">
+          <div class="col-md-12"><span class="align-top incident-head" >Export evidence option:</span></div>
+        </div>
+        <!-- Export Radio select time-->
+        <div class="row transfer-item">
+          <div class="col-md-12">
+              <form>
+                  <div class="form-group"> 
+                    <div id='time_transfer' class="radio">
+                      <label><input type="radio" value='30' name="optradio" id='t1' checked> 30s</label> 
+                      <label><input type="radio" value='60' id='t2' name="optradio"> 60s</label>
+                      <label><input type="radio"  id='t3' value='120' name="optradio"> 120s</label>
+                    </div>
+                  </div>
+              </form>
+          </div>
+        </div>
+        <!-- Export Button -->
+        <div class="row incident-item">
+          <div class="col-md-12">
+              <button type="submit" onclick="export_evidence()"  class="btn btn-success">Export</button>
+          </div>
+        </div>
+      </div><!--  end ExportCard-->
+         </div>
+
+
+
+</div><!-- END INCIDENTS TAB-->
+
+<!-- DIRECTORY TAB -->         
+<div class="row hidden directory" id="directory">
+    <!-- Directory New User -->
+    <div class="col-md-6">
+        <h2>Directory</h2> 
+        <h5>Add a new Person</h5>
+        <!-- Directory form -->
+        <form id="newuser" name="newuser">
+          <!-- Fullname -->
+          <div class="form-group form-group-directory">
+              <input name="fullname" id="fullname" type="text" class="form-control" placeholder="Full name">
+          </div>
+          <!-- Title -->
+          <div class="form-group form-group-directory ">
+             <input name="title" id="title" type="text" class="form-control" placeholder="Job title">
+          </div> 
+          <!-- E-mail --> 
+          <div class="form-group form-group-directory">
+              <input name="email" type="email" class="form-control" id="email" placeholder="Email" aria-describedby="emailHelp">
+          </div>
+          <!-- Phone -->
+          <div class="form-group">
+              <input name="phone" type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
+          </div>  
+          <!-- Button Submit -->
+          
+          <button class="btn btn-success search-btn btn-directory" onclick="btnDir(event)"><i class="fa fa-plus-square" aria-hidden="true"></i></button>
+        </form>
+
+    </div><!-- End Directory New User -->
+
+    <!-- Directory table -->
+    <div class="col-md-6 " >
+        <table id="nametable" class="table table-names table-hover tablediv table-condensed table-dark table-responsive-md">
+            <thead>
+              <tr class="clickable-row">
+                  <th hidden="true" data-field="id">ID</th>
+                  <th data-field="fullname" >Full Name</th>
+                  <th data-field="email" >E-Mail</th>
+                  <th data-field="phone">Phone Number</th>
+                  <th data-field="title">Title</th>
+              </tr>
+            </thead>
+            <tbody id = 'rowsnames'>
+            </tbody>
+        </table>
+        <button type="submit"  onclick="deleteUser()" class="btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+    </div><!--End Directory table -->
+</div>
+<!-- END DIRECTORY TAB -->
+
+<!-- REPORTS TAB -->
+<div class="row hidden directory" id="reports">
+  <div class="col-md-12" id='formreports'>
+    <div class="box-header">
+          <h2>Reports</h2> 
+        </div>
+    <form class="consolidado" id="formulario">
+      <div class="box box-primary">
+     
+        <div class="box-body">
+            <!--------------- Date ----------------->
+            <div class="col-md-6">
+                <div class="form-group">
+                <label class="box-label">Range</label>
+                    <div class="input-group">
+                      <div class="input-group-addon">
+                        <i class="fa fa-clock-o"></i>
+                      </div>
+                      <input type="text" class="form-control pull-right" id="reservationtime">
+                    </div><!-- /.input group -->
+                </div><!-- /.form-group -->
+            </div><!-- /.col-md -->
+            <!---------------Inicidents----------------->
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label class="box-label">Type of Incident</label>
+                    <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true" id="incidents-list">
+                      <option selected="selected" value="All">All</option>
+                      <option value="MD_START">Motion detection start</option>
+                      <option value="MD_STOP">Motion detection stop</option>
+                      <option value="ARMED">Camera armed</option>
+                      <option value="DISARMED">Camera disarmed</option>
+                      <option value="ATTACH">Camera connected</option>
+                      <option value="DETACH">Camera disconnected</option>
+                      <option value="REC">Camera recording</option>
+                      <option value="REC_ERROR">Camera recording error</option>
+                      <option value="REC_STOP">Camera recording stop</option>
+                      <option value="VCA_EVENT">Video analytic event</option>
+                    </select>
+                </div>
+            </div>
+            <!---------------States ----------------->
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label class="box-label">State</label>
+                    <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" data-select2-id="0" tabindex="-1" aria-hidden="true" id="state-list">
+                      <option selected="selected" value="0">All</option>
+                      <option value="New">New</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                </div><!-- /.form-group -->
+            </div><!-- /.col-md -->
+            <!---------------Cameras ----------------->
+            <div class="col-md-6">
+                <div class="form-group">
+                  <label class="box-label">Cameras</label>
+                    <select class="form-control select2 select2-hidden-accessible cam_select" id="cam_select" multiple="" data-placeholder="Select Cameras" style="width: 100%;" data-select2-id="7" tabindex="-1" aria-hidden="true">
+                      <option data-select2-id="26">Cameras not loaded</option>
+                    </select>
+                </div><!-- /.form-group -->
+            </div><!-- /.col-md -->
+            <!---------------Submit----------------->
+            <div class="col-md-6">
+                <div class="form-group ">
+                  <button type="submit" onclick="reports(event)" class="btn btn-primary search-btn ">Search</button>
+                </div>
+            </div><!-- /.col-md -->
+        </div><!-- /.box-body -->
+      </div><!-- /.box box-primary -->
+    </form> 
+  </div><!--  end ./col-md Div Reports -->
+
+<div class="col-md-12 hidden overlay" id='overlaydiv'>
+
+<section>
+    <div id="overlay"> 
+        <i class="fa fa-spinner fa-spin spin-big"></i>
+</section>
+</div>
+
+
+   <div class="col-md-12 hidden " id="tablereports">
+      <div class="box-header">
+        <h3 class="box-title" id='resultsTitle'><i class="fa fa-backward" id="backReport" aria-hidden="true"></i> Reports</h3>
+      </div>
+      <table id="table" class="table  table-reports table-hover tablediv table-condensed table-dark table-responsive-md">
+        <thead>
+          <tr class="clickable-row">
+            <th hidden="true" data-field="id">ID</th>
+            <th data-field="name" >Camera id</th>
+            <th data-field="name" >Incident</th>
+            <th data-field="time" >Incident Time</th>
+            <th data-field="state">State</th>
+            <th data-field="operator">Operator</th>
+            <th data-field="response_time">Response Time</th>
+            <th data-field="resolution_time">Resolution Time</th>
+          </tr>
+        </thead>
+        <tbody id = 'rowsResults'>
+        </tbody>
+      </table>
+    </div>
+</div><!--  end ./row Div Reports -->
+<!-- END REPORTS TAB -->
+  <div id="progress">
+    <span class="progress-text"></span>
+    <div class="progress-bar"></div>
+</div>
+<!-- HTML END-->
+</body>
+<!-- Scripts-->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"> </script>
+<script src="js/bootstrap.bundle.min.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"> </script>
+<script src="bower_components/moment/min/moment.min.js"></script>
+<script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap datepicker -->
+<script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<!-- Select2 -->
+<script src="bower_components/select2/dist/js/select2.full.min.js"></script>
+<!-- InputMask -->
+<script src="plugins/input-mask/jquery.inputmask.js"></script>
+<script src="plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="plugins/input-mask/jquery.inputmask.extensions.js"></script>
+<script src="bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<!-- bootstrap color picker -->
+<script src="bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
+<!-- bootstrap time picker -->
+<script src="plugins/timepicker/bootstrap-timepicker.min.js"></script>
+<!-- SlimScroll -->
+<script src="bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<!-- iCheck 1.0.1 -->
+<script src="plugins/iCheck/icheck.min.js"></script>
+<!-- FastClick -->
+<script src="bower_components/fastclick/lib/fastclick.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="js/main.js"> </script>
+<script src="js/datepicker.js"> </script>
+<script src="js/main.js"> </script>
+
+</html>

@@ -1,0 +1,82 @@
+.input-group .input-group-addon {
+  
+    border-color: #d2d6de;
+
+}
+.input-group-addon:first-child {
+    border-right: 0;
+}
+
+.input-group-addon {
+    padding: 6px 12px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.input-group-addon, .input-group-btn {
+    width: 1%;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.input-group .form-control, .input-group-addon, .input-group-btn {
+    display: table-cell;
+}
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+user agent stylesheet
+div {
+    display: block;
+}
+.input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+}
+
+.input-group>.custom-file, .input-group>.custom-select, .input-group>.form-control, .input-group>.form-control-plaintext {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+     width: 100%;
+    margin-bottom: 0;
+}
+
+.form-group {
+    margin-bottom: 0rem;
+}
+
+.form-group-directory {
+    margin-bottom: 0.6rem;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #1f2840;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    color:#fff;
+    cursor: default;
+    float: left;
+    margin-right: 5px;
+    margin-top: 2px;
+    padding: 0 5px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    box-sizing: border-box;
+    list-style: none;
+    margin: 0;
+    padding: 0 5px;
+    width: 100%;
+    color: #fff;
+    background-color: #333c5c29;
+}
+

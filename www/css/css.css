@@ -1,0 +1,323 @@
+
+h2, h5{
+  
+   color:  #fff;
+}
+
+ .bg-securos
+ {
+        background: linear-gradient(180deg, #3E4B6F, #293450);;
+        color:  #fff
+ }
+body{
+
+}
+ .table
+ {
+   margin-top: 20px;
+   background: #2C3347;
+   color:  #fff;
+   border-top: 0;
+   font-size: 12px;
+ }
+.table td, .table th
+{
+   border-top: 0;
+
+}
+.table th{
+  background: #333C5C;
+}
+
+.table-incidents table{
+  margin-right: 10px
+}
+.table-incidents tbody {
+    display:block;
+    height: 80vh;
+    overflow:auto;
+    margin-right: 10px
+}
+.table-names tbody {
+    display:block;
+    height: 45vh;
+    overflow:auto;
+    margin-right: 10px;
+
+}
+.table-names thead, .table-names tbody tr {
+    display:table;
+    width:99%;
+    table-layout:fixed;
+
+}
+.table-incidents thead, .table-incidents tbody tr {
+    display:table;
+    width:99%;
+    table-layout:fixed;
+
+}
+.table-row{
+cursor:pointer;
+}
+.table-hover tbody tr:hover td  {
+  background-color: #2485C0;
+}
+.table-selected   {
+  background-color: #195F98;
+}
+.incident-head{
+
+  font-weight: 800;
+}
+.incident-item{
+   padding:3px;
+}
+.row{
+    margin-right: 0px; 
+     margin-left: 0px;
+    flex-wrap: wrap;
+}
+.navbar{
+  padding: .1em .1rem
+}
+.card 
+{
+ background: #2C3347;
+ margin-top: 20px;
+ margin-right:  10px;
+ color:  #fff;
+ padding:  10px;
+ font-size: 12px;
+}
+
+.card-play{
+   color: #fff;
+   display: inline-block;
+   background-image: -webkit-gradient(linear,left top,right top,color-stop(69%,#fff),color-stop(100%,#0f49581a));
+   background-image: -webkit-linear-gradient(left,#12841F 0%,#00F91C 100%);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   margin-top: 2px;
+   left: 10px;
+   font-size: 20px;
+   text-shadow: 5px 5px #558ABB;
+}
+body{
+  background: #1F2840;
+ }
+
+
+
+
+.close{
+   color:  #fff;
+}
+.btn-group{
+  padding-top: 10px
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.-btn{
+  margin-left: 5px;
+}
+
+
+.directory{
+  padding-top: 20px
+}
+
+.directory .reports{
+  padding-top: 20px
+}
+
+
+.label-date{
+  color:  #fff;
+}
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.time{
+  margin-left: 20px;
+}
+
+.box-title{
+   color:  #fff;
+   margin-top: 20px;
+    font-size: 17px;
+    margin-left: 15px;
+}
+.box-label{
+   color:  #fff;
+   margin-top: 20px;
+   font-size: 12px;
+   margin-left: 0px;
+}
+
+.search-btn
+{
+  margin-top: 10px;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; // remove the gap so it doesn't close
+ }
+ .navbar-text{
+  margin-right: 20px
+   color: rgba(255,255,255,0.5);
+ }
+
+ .circle {
+  background: rgba(155, 79, 243, 0.74);
+  text-transform: uppercase;
+  font-family: "Lucida Console";
+  align-items:center;
+  color: rgba(233, 236, 237, 0.78);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  font-size: 16px;
+  padding: 10px;
+  vertical-align: middle;
+  margin: 0 10px 0 0;
+}
+
+
+.table-reports tbody {
+    display:block;
+    height: 50vh;
+    overflow:auto;
+    margin-right: 10px
+}
+.table-reports thead, .table-reports tbody tr {
+    display:table;
+    width:99%;
+    table-layout:fixed;
+    overflow:hidden;
+
+}
+
+.filters{
+  padding-top: 20px;
+}
+.activeIncidents{
+  margin-right: 50px;
+  color: rgba(255,255,255,1);
+}
+.triangle{
+  color: #f00;
+}
+.navbar-dark .navbar-text {
+    color: rgba(255,255,255,1);
+}
+.navbar-dark .navbar-text .user {
+    color: rgba(255,255,255,0.5);
+}
+
+.card-title h5{
+color: #2485C0;
+}
+
+.bootstrap-select.btn-group .dropdown-toggle .filter-option {
+    display: inline-block;
+    overflow: hidden;
+    width: 100%;
+    text-align: left;
+}
+.pull-left {
+    float: left!important;
+}
+.pull-left {
+    float: left;
+}
+.pull-left {
+    float: left;
+}
+
+.btn {
+
+    padding: 0.575rem .75rem;
+
+}
+
+.bootstrap-select .dropdown-toggle .filter-option {
+   padding-top: 2px;
+}
+.select{
+  padding-top: 1px;
+}
+
+.btn-sm {
+    padding: 0rem .75rem;
+}
+
+
+.hidden {
+visibility:hidden;
+display: none;
+}
+
+.select2-container .select2-selection--single {
+
+    height: 36px;
+
+}
+
+section {
+    width: 100%;
+    height: 100%;
+    margin: 50px;
+}
+#overlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    color:  #fff;
+    z-index: 99999999999;
+    background: rgb(31 40 64);
+}
+#overlay i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+.spin-big {
+    font-size: 50px;
+    height: 50px;
+    width: 50px;
+    margin-top: -25px;
+    margin-left: -25px;
+}
+.spin-normal {
+    font-size: 35px;
+    height: 35px;
+    width: 35px;
+    margin-top: -22.5px;
+    margin-left: -22.5px;
+}
+.spin-small {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+}
+
+.backReport{
+  margin-top: -7;
+
+}

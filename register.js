@@ -4,10 +4,20 @@ const request = require('request');
 const config = require('./config')
 
 
-const data = {
+const cams = {
 "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-"type": ""
+"type": "CAM"
 }
+}
+const sensors = {
+  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
+  "type": "SENSOR"
+  }
+}
+const partitions = {
+  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
+  "type": "PARTITION"
+  }
 }
 
 var username = config.restapi_user;
@@ -26,8 +36,7 @@ var optionspost= {
     auth: {
         username: config.restapi_user,
         password: config.restapi_pass
-    },
-    json: data
+    }
   };
 
 request.get(options, (err, res, body) => {
@@ -55,11 +64,23 @@ request.get(options, (err, res, body) => {
 function createSubscription()
 {
   console.log('Creating subscription...');
+  optionspost.json = cams;
+  request.post(optionspost, (err, res, body) => {
+    if (err) {  console.log(err); console.log('fail request post'); return }
+    console.log(body);
+  })
+  optionspost.json = sensors;
+  request.post(optionspost, (err, res, body) => {
+    if (err) {  console.log(err); console.log('fail request post'); return }
+    console.log(body);
+  })
+  optionspost.json = partitions;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
     console.log(body);
   })
 }
+
 
 function deleteEvents(id)
 {

@@ -17,8 +17,9 @@ const sensors = {
 const partitions = {
   "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
   "type": "PARTITION"
-  }
+   }
 }
+
 
 var username = config.restapi_user;
 var password = config.restapi_pass;

@@ -249,13 +249,19 @@ function btnProcedure(event){
 
 function buildTable(json)
 {
-    console.log("buildTable")
+    console.log(json)
     var cam_select = document.getElementById('cam_select');
     var table = ''
     for(var i=0; i< json.length; i++){
        table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+'">'
        table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
-       table += '<td id="camera_id" >'+cam_select[json[i].camera_id].innerHTML+'</td>'
+       table += '<td id="type" >'+json[i].type +'</td>'
+       table += '<td id="object_id" >'+json[i].object_id+'</td>'
+       if(json[i].type == 'CAM')
+            table += '<td id="name" >'+cam_select[json[i].object_id].innerHTML+'</td>'
+       if(json[i].type == 'SENSOR')
+            table += '<td id="name" >'+json[i].object_id+'</td>'
+       
        table += '<td id="incident" >'+json[i].incident+'</td>'
        table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
        table += '<td id="state">'+json[i].state || ''+'</td>'
@@ -312,7 +318,7 @@ $(document).ready(function($) {
         //variables for Incidents TAB  
         var id =  $(this).find("td#" + 'id').html()
         var incidentTime =  $(this).find("td#" + 'time').html()
-        var camera = $(this).find("td#" + 'camera_id').html()
+        var camera = $(this).find("td#" + 'name').html()
         var priority = $(this).find("td#" + 'priority').html()
         var state = $(this).find("td#" + 'state').html()
         var comment = $(this).find("td#" + 'comment').html()
@@ -380,7 +386,7 @@ function btnDir(e)
 //-------------------------- JQUERYS Section -----------------
 
 //Activate Multiple Select filter for Incidents Type
-$('.select').selectpicker({noneSelectedText: 'All type of incidents',width:'100%'})
+$('.select').selectpicker({noneSelectedText: 'Tipo de incidente',width:'100%'})
 
 //Close Inicidents TAB  deselect rows and goto top table
 $(".closeCard").click(function(e) 
@@ -433,26 +439,26 @@ $(".dropdown-item").click(function(e)
         case 'Export Evidence':
             exportEvidence()
         break;
-        case 'In Progress':
-             state('In Progress');
+        case 'En Progreso':
+             state('En Progreso');
         break;
-        case 'Resolved':
-             state('Resolved');
+        case 'Resuelto':
+             state('Resuelto');
         break;
-        case 'Closed':
-             state('Closed');
+        case 'Cerrado':
+             state('Cerrado');
         break;
-        case 'False Alarm':
-             state('False Alarm');
+        case 'Falsa Alarma':
+             state('Falsa Alarma');
         break;
-        case 'Low Priority':
-             priority('Low');
+        case 'Priorida Baja':
+             priority('Baja');
         break;
-        case 'Medium Priority':
-             priority('Medium');
+        case 'Priorida Media':
+             priority('Media');
         break;
-        case 'High Priority':
-             priority('High');
+        case 'Priorida Alta':
+             priority('Alta');
         break;
         case 'Started monitoring the incident':
              procedure('Started monitoring the incident');
@@ -570,20 +576,25 @@ function state(state)
     var co =   document.getElementById('card_comment').value; 
     var json = {"id":id,
                 "state":state,
-                "response_time":localtimeString,
                 "operator": operator || 'External User',
                 "comment":co
                 };
-    console.log('json',json)                
-    if(state == 'Resolved' || state == 'Closed')
+    console.log('json',json)   
+
+    if(state == 'En Progreso')
+    {
+        json.response_time = localtimeString          
+    }
+          
+    if(state == 'Resuelto' || state == 'Cerrado')
     {
         json.resolution_time = localtimeString;         
     }
 
-    if(state == 'False Alarm')
+    if(state == 'Falsa Alarma')
     {
         json.resolution_time = localtimeString; 
-        json.comment += '\nFalse Alarm'
+        json.comment += '\nFalsa Alarma'
         document.getElementById('card_comment').innerHTML = json.comment;  
     }
     console.log(json)              
@@ -707,6 +718,7 @@ function filterByIncident(obj) {
 
 function filterByState(obj) {
   var input;
+  console.log(obj.value)
   filterstate = obj.value;
   if(filterstate=='All')
     filterstate='';
@@ -729,7 +741,7 @@ function filter()
         for (i = 1; i < tr.length; i++) {
             td1 = tr[i].getElementsByTagName("td")[1];   //Camera Name
             td2 = tr[i].getElementsByTagName("td")[9];   //Type of Incident
-            td3 = tr[i].getElementsByTagName("td")[4];   //State
+            td3 = tr[i].getElementsByTagName("td")[6];   //State
             
             //filter By Name
             if (td1 &&  filtername!=""){
@@ -768,7 +780,7 @@ function filter()
             //Check  filters
             if (f1 && f2 && f3 && td3) {
                 txtValue = td3.textContent || td3.innerText; 
-                if(txtValue =='New' || txtValue == 'In Progress')
+                if(txtValue =='Nuevo' || txtValue == 'En progreso')
                     activeIncidents++;
                 tr[i].style.display = "";
             } 

@@ -2,8 +2,8 @@ var Service = require('node-windows').Service;
 
 // Create a new service object
 var svc = new Service({
-     name:'SecurOS Hikvision Plugin',
-     description: 'SecurOS Plugin to Hikvision Thermal Analytics V2.0.0',
+     name:'SecurOS Dispatch Module 10.x',
+     description: 'SecurOS Plugin to Dispatch Module, ',
      script: 'index.js'
 });
 

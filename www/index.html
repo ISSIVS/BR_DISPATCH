@@ -28,13 +28,13 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#" onclick="incidents()"><i class="fa fa-list-ul" aria-hidden="true"></i> Incidents <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="#" onclick="incidents()"><i class="fa fa-list-ul" aria-hidden="true"></i> Incidentes <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" onclick="directory()"><i class="fa fa-address-book" aria-hidden="true"></i> Directory</a>
+            <a class="nav-link" href="#" onclick="directory()"><i class="fa fa-address-book" aria-hidden="true"></i> Directorio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" onclick="report()"><i class="fa fa-download" aria-hidden="true"></i> Reports</a>
+            <a class="nav-link" href="#" onclick="report()"><i class="fa fa-download" aria-hidden="true"></i> Reportes</a>
           </li>
         </ul>
        <span class="navbar-text activeIncidents" id='activeIncidents'></span>  <span class="navbar-text user" style="color:rgba(255,255,255,0.5)" id="test" > External User</span>
@@ -45,32 +45,32 @@
 <div class="row incidents" id="incidents">
     <!-- Filter by name -->
     <div class="col-md-3 filters" id="filters">
-      <input type="text" style="width: 100%" id="filterbyname" onkeyup="filterByName()" placeholder="Filter by camera name..." title="Type in a name">
+      <input type="text" style="width: 100%" id="filterbyname" onkeyup="filterByName()" placeholder="Filtrar por nombre..." title="Type in a name">
     </div>
     <!-- Filter by incident -->
     <div class="col-md-3 filters" id="filters">
                     <select class="selectpicker select"  multiple data-live-search="true"  onchange="filterByIncident(this)" style="width: 100%;" tabindex="-1" aria-hidden="true" id="filterbyincident">
-                      <option value="MD_START">Motion detection start</option>
-                      <option value="MD_STOP">Motion detection stop</option>
-                      <option value="ARMED">Camera armed</option>
-                      <option value="DISARMED">Camera disarmed</option>
-                      <option value="ATTACH">Camera connected</option>
-                      <option value="DETACH">Camera disconnected</option>
-                      <option value="REC">Camera recording</option>
-                      <option value="REC_ERROR">Camera recording error</option>
-                      <option value="REC_STOP">Camera recording stop</option>
-                      <option value="VCA_EVENT">Video analytic event</option>
+                      <option value="MD_START">Deteccion de Movimiento Iniciado</option>
+                      <option value="MD_STOP">Deteccion de Movimiento Finalizado<</option>
+                      <option value="ARMED">Camara Armada</option>
+                      <option value="DISARMED">Camara Desarmada</option>
+                      <option value="ATTACH">Camara Conectada</option>
+                      <option value="DETACH">Camara Desconectada</option>
+                      <option value="REC">Grabancion Iniciada</option>
+                      <option value="REC_ERROR">Error de Grabacionr</option>
+                      <option value="REC_STOP">Grabacion Detenida</option>
+                      <option value="VCA_EVENT">Evento de Analitica</option>
                     </select>
               
     </div>
     <!-- Filter by State -->
     <div class="col-md-3 filters" id="filters">
      <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" onchange="filterByState(this)" data-select2-id="0" tabindex="-1" aria-hidden="true" id="filterbystate">
-                      <option selected="selected" value="All">All states</option>
-                      <option value="New">New</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Closed">Closed</option>
+                      <option selected="selected" value="All">Todos los estados</option>
+                      <option value="Nuevo">Nuevo</option>
+                      <option value="En progreso">En progreso</option>
+                      <option value="Resuelto">Resuelto</option>
+                      <option value="Cerrado">Cerrado</option>
                     </select>
     </div>
     <!-- main table -->
@@ -79,14 +79,16 @@
         <thead>
           <tr class="clickable-row">
             <th data-field="id" width="100px">ID</th>
-            <th data-field="name" >Camera name</th>
-            <th data-field="name" >Incident</th>
-            <th data-field="time" >Incident Time</th>
-            <th data-field="state">State</th>
-            <th data-field="operator">Operator</th>
-            <th data-field="response_time">Response Time</th>
-            <th data-field="resolution_time">Resolution Time</th>
-            <th hidden="true" data-field="action">Action</th>
+            <th data-field="name" >Tipo de Objeto</th>
+            <th data-field="name" >Id de Objeto</th>
+            <th data-field="name" >Nombre</th>
+            <th data-field="name" >Evento</th>
+            <th data-field="time" >Tiempo de Evento</th>
+            <th data-field="state">Estado</th>
+            <th data-field="operator">Operador</th>
+            <th data-field="response_time">Tiempo de respuesta</th>
+            <th data-field="resolution_time">Tiempo de Resolucion</th>
+            <th hidden="true" data-field="action">Accion</th>
           </tr>
         </thead>
         <tbody id = 'rows'>
@@ -98,7 +100,7 @@
         <div class="row">
           <!-- Title -->
           <div class="col card-title">
-            <h5>Incident <span  id="card_title"></span></h5>
+            <h5>Incidente <span  id="card_title"></span></h5>
           </div>
           <!-- Close button -->
           <div class="col">
@@ -110,22 +112,22 @@
         <!-- Items  Inicident card-->
         <!-- Date-->
         <div class="row incident-item">
-          <div class="col-md-6"><span class="align-top incident-head" >Date:</span></div>
+          <div class="col-md-6"><span class="align-top incident-head" >Fecha:</span></div>
           <div class="col-md-6"> <span class="align-top" id="card_incidentDate"></span></div>
         </div>
         <!-- Time-->
         <div class="row incident-item">
-            <div class="col-md-6"><span class="align-top incident-head" >Time:</span></div>
+            <div class="col-md-6"><span class="align-top incident-head" >Hora:</span></div>
             <div class="col-md-6"> <span class="align-top" id="card_incidentTime"></span></div>
         </div>
         <!-- Location-->
         <div class="row incident-item">
-            <div class="col-md-6"><span class="align-top incident-head" >Location: </span></div>
+            <div class="col-md-6"><span class="align-top incident-head" >Ubicacion: </span></div>
             <div class="col-md-6"> <span class="align-top" id="card_location"></span></div>
         </div>
         <!-- Camera name-->
         <div class="row incident-item">
-            <div class="col-md-6"><span class="align-top incident-head">Camera:</span></div>
+            <div class="col-md-6"><span class="align-top incident-head">Objeto:</span></div>
             <div class="col-md-6"> <span class="align-top"  id="card_camera"></span></div>
         </div>
         <!-- Camera ID-->
@@ -135,19 +137,19 @@
         </div>
         <!-- State-->
         <div class="row incident-item">
-            <div class="col-md-6"><span class="align-top incident-head">State:</span></div>
-            <div class="col-md-6"> <span class="align-top"  id="card_state">New</span></div>
+            <div class="col-md-6"><span class="align-top incident-head">Estado:</span></div>
+            <div class="col-md-6"> <span class="align-top"  id="card_state">Nuevo</span></div>
         </div>
         <!-- Priority-->
         <div class="row incident-item">
-          <div class="col-md-6"><span class="align-top incident-head" >Priority:</span></div>
-          <div class="col-md-6"> <span class="align-top" id="card_priority">Medium</span></div>
+          <div class="col-md-6"><span class="align-top incident-head" >Prioridad:</span></div>
+          <div class="col-md-6"> <span class="align-top" id="card_priority">Media</span></div>
         </div>
         <!-- Procedure-->
         <div class="row incident-item">
           <div class="col-md-6"><span class="align-top incident-head" ><div class="btn-group dropleft">
               <button class="btn btn-secondary btn-sm  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Procedure
+                Procedimiento
               </button>
               <div class="dropdown-menu">
                    <a class="dropdown-item" href="#">Started monitoring the incident</a>
@@ -167,42 +169,42 @@
         </div>
           <!-- Comments-->
         <div class="row incident-item">
-             <div class="col-md-12"><span class="align-top incident-head">Comment: </span></div>
+             <div class="col-md-12"><span class="align-top incident-head">Comentario: </span></div>
              <div class="col-md-12"><textarea class="form-control" id="card_comment" rows="2"></textarea></div>
         </div>
         <!-- INCIDENTS BUTTONS -->
         <div class="row">
             <div class="col-md-12 ">
                 <div class="btn-group">
-                  <button class="btn btn-success  " onclick="play()" type="button">Play  <i class="fa fa-play"></i>
+                  <button class="btn btn-success  " onclick="play()" type="button">Reproducir  <i class="fa fa-play"></i>
                   </button>
-                  <button class="btn btn-primary " onclick="live()" type="button">Live <i class="fa fa-video-camera" aria-hidden="true"></i>
+                  <button class="btn btn-primary " onclick="live()" type="button">En vivo <i class="fa fa-video-camera" aria-hidden="true"></i>
                   </button>
                   <div class="btn-group dropleft">
-                  <button class="btn btn-info  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions
+                  <button class="btn btn-info  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Acciones
                   </button>
                       <ul class="dropdown-menu">
-                          <a class="dropdown-item" href="#">Transfer</a> 
-                          <a class="dropdown-item" href="#">Export Evidence</a> 
+                          <a class="dropdown-item" href="#">Transferir</a> 
+                          <a class="dropdown-item" href="#">Exportar Evidencia</a> 
                           <!-- Submenu Priority -->
                           <div class="dropdown-divider"></div>
                          
-                          <a class="dropdown-menu  dropdown-toggle"  href="#" data-toggle="dropdown">Change Priority</a>
+                          <a class="dropdown-menu  dropdown-toggle"  href="#" data-toggle="dropdown">Cambiar Prioridad</a>
                           <div class="dropdown-submenu">
-                              <a  class="dropdown-item" href="#">Low Priority</a>
-                              <a  class="dropdown-item"href="#">Medium Priority</a>
-                              <a  class="dropdown-item"href="#">High Priority</a>
+                              <a  class="dropdown-item" href="#">Baja Prioridad</a>
+                              <a  class="dropdown-item"href="#">Media Prioridad</a>
+                              <a  class="dropdown-item"href="#">Alta Prioridad</a>
                           </div>
                          
                           <!-- Submenu State -->
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown"  >Change State</a>
+                          <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown"  >Cambiar Estado</a>
                           <div class="dropdown-submenu">
-                              <a class="dropdown-item" href="#">In Progress</a>
-                              <a class="dropdown-item"href="#">Resolved</a>
-                              <a class="dropdown-item"href="#">Closed</a>
+                              <a class="dropdown-item" href="#">En Progreso</a>
+                              <a class="dropdown-item"href="#">Resuelto</a>
+                              <a class="dropdown-item"href="#">Cerrado</a>
                               <div class="dropdown-divider"></div>
-                              <a class="dropdown-item"href="#">False Alarm</a>
+                              <a class="dropdown-item"href="#">Falsa Alarma</a>
                           </div>
                       </ul>
                   </div><!--  btn-group dropleft -->
@@ -216,7 +218,7 @@
         <div class="row">
           <!-- Title-->
           <div class="col card-title">
-            <h5>Transfer <span  id="card_title"></span></h5>
+            <h5>Transferir <span  id="card_title"></span></h5>
           </div>
           <!-- Close Button-->
           <div class="col">
@@ -227,13 +229,13 @@
         </div>
         <!-- Transfer To Lable-->
         <div class="row transfer-item">
-          <div class="col-md-6"><span class="align-top incident-head" >To:</span></div>
+          <div class="col-md-6"><span class="align-top incident-head" >Para:</span></div>
         </div>
         <!-- Transfer To Selection Dropdown-->
         <div class="row incident-item">
           <div class="col-md-12">
             <select id="to" name="to" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref" placeholder="to">
-                <option selected value="">Select</option>
+                <option selected value="">Seleccionar</option>
             </select>
           </div>
         </div>
@@ -241,7 +243,7 @@
         <!-- Transfer Button -->
         <div class="row incident-item">
           <div class="col-md-12">
-              <button type="submit" onclick="send_transfer()"  class="btn btn-success">Send</button>
+              <button type="submit" onclick="send_transfer()"  class="btn btn-success">Enviar</button>
           </div>
         </div>
       </div><!--  end transferCard-->
@@ -252,7 +254,7 @@
         <div class="row">
           <!-- Title-->
           <div class="col card-title">
-            <h5>Export evidence <span  id="card_title"></span></h5>
+            <h5>Exportar Evidencia <span  id="card_title"></span></h5>
           </div>
           <!-- Close Button-->
           <div class="col">
@@ -263,7 +265,7 @@
         </div>
         <!-- Export time Lable-->
         <div class="row transfer-item">
-          <div class="col-md-12"><span class="align-top incident-head" >Export evidence option:</span></div>
+          <div class="col-md-12"><span class="align-top incident-head" >Opciones para Exportar:</span></div>
         </div>
         <!-- Export Radio select time-->
         <div class="row transfer-item">
@@ -282,7 +284,7 @@
         <!-- Export Button -->
         <div class="row incident-item">
           <div class="col-md-12">
-              <button type="submit" onclick="export_evidence()"  class="btn btn-success">Export</button>
+              <button type="submit" onclick="export_evidence()"  class="btn btn-success">Exportar</button>
           </div>
         </div>
       </div><!--  end ExportCard-->
@@ -296,17 +298,17 @@
 <div class="row hidden directory" id="directory">
     <!-- Directory New User -->
     <div class="col-md-6">
-        <h2>Directory</h2> 
-        <h5>Add a new Person</h5>
+        <h2>Directorio</h2> 
+        <h5>Agregar nuevo contacto</h5>
         <!-- Directory form -->
         <form id="newuser" name="newuser">
           <!-- Fullname -->
           <div class="form-group form-group-directory">
-              <input name="fullname" id="fullname" type="text" class="form-control" placeholder="Full name">
+              <input name="fullname" id="fullname" type="text" class="form-control" placeholder="Nombre completo">
           </div>
           <!-- Title -->
           <div class="form-group form-group-directory ">
-             <input name="title" id="title" type="text" class="form-control" placeholder="Job title">
+             <input name="title" id="title" type="text" class="form-control" placeholder="Cargo">
           </div> 
           <!-- E-mail --> 
           <div class="form-group form-group-directory">
@@ -314,7 +316,7 @@
           </div>
           <!-- Phone -->
           <div class="form-group">
-              <input name="phone" type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
+              <input name="phone" type="tel" id="phone" name="phone" class="form-control" placeholder="Numero telefonico">
           </div>  
           <!-- Button Submit -->
           
@@ -329,10 +331,10 @@
             <thead>
               <tr class="clickable-row">
                   <th hidden="true" data-field="id">ID</th>
-                  <th data-field="fullname" >Full Name</th>
+                  <th data-field="fullname" >Nombre</th>
                   <th data-field="email" >E-Mail</th>
-                  <th data-field="phone">Phone Number</th>
-                  <th data-field="title">Title</th>
+                  <th data-field="phone">Numero telefonico</th>
+                  <th data-field="title">Cargo</th>
               </tr>
             </thead>
             <tbody id = 'rowsnames'>
@@ -347,7 +349,7 @@
 <div class="row hidden directory" id="reports">
   <div class="col-md-12" id='formreports'>
     <div class="box-header">
-          <h2>Reports</h2> 
+          <h2>Reportes</h2> 
         </div>
     <form class="consolidado" id="formulario">
       <div class="box box-primary">
@@ -356,7 +358,7 @@
             <!--------------- Date ----------------->
             <div class="col-md-6">
                 <div class="form-group">
-                <label class="box-label">Range</label>
+                <label class="box-label">Rango</label>
                     <div class="input-group">
                       <div class="input-group-addon">
                         <i class="fa fa-clock-o"></i>
@@ -368,7 +370,7 @@
             <!---------------Inicidents----------------->
             <div class="col-md-6">
                 <div class="form-group">
-                  <label class="box-label">Type of Incident</label>
+                  <label class="box-label">Tipo de Incidente</label>
                     <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" data-select2-id="1" tabindex="-1" aria-hidden="true" id="incidents-list">
                       <option selected="selected" value="All">All</option>
                       <option value="MD_START">Motion detection start</option>
@@ -387,29 +389,29 @@
             <!---------------States ----------------->
             <div class="col-md-6">
                 <div class="form-group">
-                  <label class="box-label">State</label>
+                  <label class="box-label">Estado</label>
                     <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" data-select2-id="0" tabindex="-1" aria-hidden="true" id="state-list">
-                      <option selected="selected" value="0">All</option>
-                      <option value="New">New</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Closed">Closed</option>
+                      <option selected="selected" value="0">Todos</option>
+                      <option value="New">Nuevo</option>
+                      <option value="In Progress">En progeso</option>
+                      <option value="Resolved">Resuelto</option>
+                      <option value="Closed">Cerrado</option>
                     </select>
                 </div><!-- /.form-group -->
             </div><!-- /.col-md -->
             <!---------------Cameras ----------------->
             <div class="col-md-6">
                 <div class="form-group">
-                  <label class="box-label">Cameras</label>
+                  <label class="box-label">Camaras</label>
                     <select class="form-control select2 select2-hidden-accessible cam_select" id="cam_select" multiple="" data-placeholder="Select Cameras" style="width: 100%;" data-select2-id="7" tabindex="-1" aria-hidden="true">
-                      <option data-select2-id="26">Cameras not loaded</option>
+                      <option data-select2-id="26">Camaras no cargadas</option>
                     </select>
                 </div><!-- /.form-group -->
             </div><!-- /.col-md -->
             <!---------------Submit----------------->
             <div class="col-md-6">
                 <div class="form-group ">
-                  <button type="submit" onclick="reports(event)" class="btn btn-primary search-btn ">Search</button>
+                  <button type="submit" onclick="reports(event)" class="btn btn-primary search-btn ">Buscar</button>
                 </div>
             </div><!-- /.col-md -->
         </div><!-- /.box-body -->
@@ -428,19 +430,20 @@
 
    <div class="col-md-12 hidden " id="tablereports">
       <div class="box-header">
-        <h3 class="box-title" id='resultsTitle'><i class="fa fa-backward" id="backReport" aria-hidden="true"></i> Reports</h3>
+        <h3 class="box-title" id='resultsTitle'><i class="fa fa-backward" id="backReport" aria-hidden="true"></i> Reportes</h3>
       </div>
       <table id="table" class="table  table-reports table-hover tablediv table-condensed table-dark table-responsive-md">
         <thead>
           <tr class="clickable-row">
             <th hidden="true" data-field="id">ID</th>
-            <th data-field="name" >Camera id</th>
-            <th data-field="name" >Incident</th>
-            <th data-field="time" >Incident Time</th>
-            <th data-field="state">State</th>
-            <th data-field="operator">Operator</th>
-            <th data-field="response_time">Response Time</th>
-            <th data-field="resolution_time">Resolution Time</th>
+            <th data-field="name" >Tipo de Objeto</th>
+            <th data-field="name" >Nombre</th>
+            <th data-field="name" >Incidente</th>
+            <th data-field="time" >Tiempo de Incidente</th>
+            <th data-field="state">Estado</th>
+            <th data-field="operator">Operador</th>
+            <th data-field="response_time">Tiempo de Respuesta</th>
+            <th data-field="resolution_time">Tiempo de Resolucion</th>
           </tr>
         </thead>
         <tbody id = 'rowsResults'>

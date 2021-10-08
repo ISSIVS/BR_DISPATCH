@@ -6,7 +6,7 @@ const config = require('./config')
 
 const data = {
 "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-"type": "CAM"
+"type": ""
 }
 }
 
@@ -48,15 +48,12 @@ request.get(options, (err, res, body) => {
   {
     console.log("Nothing to delete")
   }
-
   createSubscription();
-
 });
 
 
 function createSubscription()
 {
-
   console.log('Creating subscription...');
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
@@ -64,11 +61,8 @@ function createSubscription()
   })
 }
 
-
-
 function deleteEvents(id)
 {
-
   console.log("Deleting record")
   var optionsDelete= {
     url: `http://${config.ip}:${config.restapi_port}/api/v1/events/subscriptions/${id}`,

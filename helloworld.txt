@@ -1,1 +1,0 @@
-{"data":{"callback":"http://127.0.0.1:8333/events","filter":{"type":"CAM"},"id":"e805d51a-6a58-4d4f-aac0-1dd9fda64ade"},"status":"success"}

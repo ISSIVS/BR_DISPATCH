@@ -31,7 +31,7 @@ ALTER TABLE directory
 CREATE TABLE IF NOT EXISTS events
 (
   incident text, -- Intrusion detector, Armed, Alarmed, etc
-  camera_id text,
+  object_id text,
   params text,
   "time" timestamp without time zone,
   type text, -- Usually CAM

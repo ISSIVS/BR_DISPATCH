@@ -1,7 +1,7 @@
 
 cd bin
 
-node unistall
+node uninstall
 
 
 @echo off

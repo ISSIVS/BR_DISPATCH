@@ -30,6 +30,7 @@ function insert(table ,json, callback){
 	//console.log(json);
   var insertQuery = `INSERT INTO ${table}(`;
   //Filds
+  console.log("query",json)
   for(var element in json){  
     if(Object.keys(json).indexOf(element) <= (Object.keys(json).length-2)){
       if(json[element] != null || json[element] != '')

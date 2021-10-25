@@ -10,6 +10,7 @@ const http_modules = require('./js/pg');
 const message = require('./js/messages');
 const email = require('./js/mail');
 const restapi = require('./js/restapi');
+const integrationServer = require('./js/integrationserver');
 const csv = require('./js/csv');
 
 app.use(bodyParser.json());
@@ -41,26 +42,36 @@ app.post('/securos', function (req, res) {
 //Register Events
 app.post('/events', function (req, res) {
 	//send to html
+	console.log("Event Received.")
 	console.log(req.body)
 	try {
 		if (req.body[0]) {
 			console.log(req.body[0])
 			var type = req.body[0].type;
 			classification(req.body[0], function (res) {
-
+				console.log("Classification Result",res)
 				req.body[0].object_id = req.body[0].id;
 				req.body[0].state = 'Nuevo';
 				req.body[0].params = JSON.stringify(req.body[0].params);
 				delete req.body[0].id;
-				message.insert("events", req.body[0], function () {
-					//actualizo HTML5
-					message.select('events', 1000, function (res) {
-						//envio a html las filas
-						io.emit('newEvent', res);
-					})
+			
+				getObject(req.body[0], function (res){
+					if(res){
+						console.log("GetObject Result:",res)
+						console.log("NAME",res.name)
+						req.body[0].name  = res.name;
+						console.log("body",req.body[0])
+						message.insert("events", req.body[0], function () {
+							//actualizo HTML5
+							message.select('events', 1000, function (res) {
+								//envio a html las filas
+								io.emit('newEvent', res);
+							});
+						});
+					}
 				});
-			});
-		}
+		});
+	 }
 	}
 	catch (e) {
 		console.log(e)
@@ -76,14 +87,14 @@ io.on('connection', function (socket) {
 	getCameras(function (res) {
 		console.log('Sending cameras to HTML5 ')
 		socket.emit('getCameras', res);
-		message.select('events', 100, function (res) {
+		message.select('events', 1000, function (res) {
 			//Send Events to html
 			console.log('Emitting to HTML5 ')
 			socket.emit('newEvent', res);
 		})
 	})
 
-	message.select('directory', 100, function (res) {
+	message.select('directory', 1000, function (res) {
 		//Send Directory to html
 		console.log('Emitting to HTML5 ')
 		socket.emit('directory', res);
@@ -175,15 +186,24 @@ io.on('connection', function (socket) {
 	});
 });
 
+var intServer = new integrationServer.integrationServer("127.0.0.1", 3015)
 
-
+function getObject(body, callback) {
+	console.log('INFO', body )
+	
+	console.log('INFO', 'Getting object...')
+	intServer.getObject(body, function (res) {
+		console.log(res)
+		callback(res)
+	})
+}
 
 function getCameras(callback) {
 	console.log('INFO', 'Getting cameras...')
 	console.log(configuration.ip, configuration.restapi_port, configuration.restapi_user, configuration.restapi_pass)
 	var rest = new restapi.restapi(configuration.ip, configuration.restapi_port, configuration.restapi_user, configuration.restapi_pass);
 	rest.getRequest('api/v1/cameras', function (res) {
-		console.log(res)
+		//console.log(res)
 		callback(res)
 	})
 }

@@ -82,16 +82,18 @@ function report(){
     inc.classList.add("hidden")
 
 }
+var cameras;
 var coordinates = [];
 function buildCameras(msg){
     var json = JSON.parse(msg);
+    cameras = json;
     var cam_select = document.getElementById('cam_select');
        var len = json.data.length;
        console.log(len);
        for (var i = 0; i<len ; i++)
           {
-            cam_select.options[json.data[i].id] = new Option(json.data[i].name,json.data[i].id);
-            coordinates[json.data[i].id] = json.data[i].settings.coordinates;
+            cam_select.options[i] = new Option(json.data[i].name,json.data[i].id);
+            coordinates[i] = json.data[i].settings.coordinates;
             console.log(json.data[i].settings.coordinates)
           }
 
@@ -249,7 +251,7 @@ function btnProcedure(event){
 
 function buildTable(json)
 {
-    console.log(json)
+    console.log('cameras',cameras)
     var cam_select = document.getElementById('cam_select');
     var table = ''
     for(var i=0; i< json.length; i++){
@@ -257,11 +259,15 @@ function buildTable(json)
        table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
        table += '<td id="type" >'+json[i].type +'</td>'
        table += '<td id="object_id" >'+json[i].object_id+'</td>'
-       if(json[i].type == 'CAM')
-            table += '<td id="name" >'+cam_select[json[i].object_id].innerHTML+'</td>'
-       if(json[i].type == 'SENSOR')
-            table += '<td id="name" >'+json[i].object_id+'</td>'
+       if(json[i].type == 'CAM'){
+        var cam =  cameras.filter(id => id === json[i].object_id);
+        console.log(cam)
+
+        table += '<td id="name" >'+'</td>'
        
+       }
+       if(json[i].type == 'SENSOR')
+            table += '<td id="name" >'+json[i].name+'</td>'
        table += '<td id="incident" >'+json[i].incident+'</td>'
        table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
        table += '<td id="state">'+json[i].state || ''+'</td>'
@@ -579,7 +585,7 @@ function state(state)
                 "operator": operator || 'External User',
                 "comment":co
                 };
-    console.log('json',json)   
+    //console.log('json',json)   
 
     if(state == 'En Progreso')
     {
@@ -597,7 +603,7 @@ function state(state)
         json.comment += '\nFalsa Alarma'
         document.getElementById('card_comment').innerHTML = json.comment;  
     }
-    console.log(json)              
+    //console.log(json)              
     document.getElementById('card_state').innerHTML = state;  
     socket.emit('state',json)
 }
@@ -636,7 +642,7 @@ function procedure(procedure)
                 "operator": operator || 'External User',
                 "comment":co + '\n' + procedure
                 };
-    console.log('procedure')
+    //console.log('procedure')
     document.getElementById('card_procedure').innerHTML =procedure ; 
     socket.emit('state',json)
 }
@@ -704,7 +710,7 @@ function filterByIncident(obj) {
     {
       if(incidents.options[i].selected)
         {
-            console.log(incidents.options[i].value)
+            //console.log(incidents.options[i].value)
           filterincident.push(incidents.options[i].value);
         }
     }

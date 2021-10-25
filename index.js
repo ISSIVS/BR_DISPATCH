@@ -87,14 +87,14 @@ io.on('connection', function (socket) {
 	getCameras(function (res) {
 		console.log('Sending cameras to HTML5 ')
 		socket.emit('getCameras', res);
-		message.select('events', 1000, function (res) {
+		message.select('events', 100000, function (res) {
 			//Send Events to html
 			console.log('Emitting to HTML5 ')
 			socket.emit('newEvent', res);
 		})
 	})
 
-	message.select('directory', 1000, function (res) {
+	message.select('directory', 100000, function (res) {
 		//Send Directory to html
 		console.log('Emitting to HTML5 ')
 		socket.emit('directory', res);
@@ -109,6 +109,7 @@ io.on('connection', function (socket) {
 
 	//Change State
 	socket.on('state', (json) => {
+
 		message.update(json.id, 'events', json, function () {
 			message.select('events', 100, function (res) {
 				//Send Events to html 
@@ -117,6 +118,16 @@ io.on('connection', function (socket) {
 				io.emit('newEvent', res);
 			})
 		});
+
+		var log = {
+			"incident_id": parseInt(json.id),
+			"time":  json.resolution_time,
+			"operator" : json.operator,
+			"event" : json.state
+		}
+		message.insert("logs",log, function(e){console.log(e)})
+
+	
 	});
 
 	//Reports

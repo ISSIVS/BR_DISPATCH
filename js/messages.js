@@ -35,7 +35,7 @@ function insert(table ,json, callback){
     if(Object.keys(json).indexOf(element) <= (Object.keys(json).length-2)){
       if(json[element] != null || json[element] != '')
       {
-
+        try{
           if(element == 'time' || element == 'resolution_time' || element == 'response_time' )
           {
               var newtime= json[element].replace('T', ' ');
@@ -45,6 +45,8 @@ function insert(table ,json, callback){
           {
               insertQuery = insertQuery+element+ ',';   
           }
+        }
+        catch(e){}
       }
     } else if(Object.keys(json).indexOf(element) == (Object.keys(json).length-1)){
         //console.log(Object.keys(json).indexOf(element), (Object.keys(json).length-1), element);
@@ -60,7 +62,7 @@ function insert(table ,json, callback){
 
       if(json[element] != null || json[element] != '')
       {
-
+          try{
           if(element == 'time' || element == 'resolution_time' || element == 'response_time' )
           {
               var newtime= json[element].replace('T', ' ');
@@ -70,6 +72,8 @@ function insert(table ,json, callback){
           {
               insertQuery = insertQuery+'\''+json[element]+'\',';   
           }
+        }
+        catch(e){}
       }
     } else if(Object.keys(json).indexOf(element) == (Object.keys(json).length-1)){
         insertQuery = insertQuery +'\''+json[element] +'\'';
@@ -77,7 +81,7 @@ function insert(table ,json, callback){
 
   }
   insertQuery = insertQuery +` )`;
-  //console.log(insertQuery);
+  console.log(insertQuery);
 	pg.query(insertQuery, function(res)
 	{
           console.log('Inserting Field into table events...');
@@ -176,6 +180,9 @@ function query(query,callback){
   });
 
 }
+
+
+
 
 //Do not modify this part
 exports.message = message;

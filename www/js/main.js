@@ -251,24 +251,22 @@ function btnProcedure(event){
 
 function buildTable(json)
 {
-    console.log('cameras',cameras)
+   
     var cam_select = document.getElementById('cam_select');
     var table = ''
     for(var i=0; i< json.length; i++){
-        table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+'">'
+        table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+' onkeydown=keydown()">'
         table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
         table += '<td id="type" >'+json[i].type +'</td>'
         table += '<td id="object_id" >'+json[i].object_id+'</td>'
         
         if(json[i].type == 'CAM'){
-            console.log("id",json[i].object_id)
-            console.log('Object',Object.values(cameras.data))
             var cam =  Object.values(cameras.data).filter( function(camera) { 
-                console.log(camera); 
+            
                 if(camera.id === json[i].object_id) 
                   return camera;    
             });
-            console.log('CAMARA:',cam)
+          
             table += '<td id="name" >'+cam[0].name+'</td>'
         }
         else{
@@ -456,6 +454,7 @@ $(".dropdown-item").click(function(e)
         break;
         case 'Resuelto':
              state('Resuelto');
+             console.log('Resuelto')
         break;
         case 'Cerrado':
              state('Cerrado');
@@ -577,7 +576,7 @@ function deleteUser()
 }
 
 //Send Update State event to server
-function state(state)
+function state(value)
 {
     var isoDateTime = new Date();
     var localDate = dateYYYYMMDD(isoDateTime);
@@ -587,31 +586,32 @@ function state(state)
     var id  =  document.getElementById('card_title').innerHTML;
     var co =   document.getElementById('card_comment').value; 
     var json = {"id":id,
-                "state":state,
+                "state":value,
                 "operator": operator || 'External User',
                 "comment":co
                 };
     //console.log('json',json)   
 
-    if(state == 'En Progreso')
+    if(value == 'En Progreso')
     {
         json.response_time = localtimeString          
     }
           
-    if(state == 'Resuelto' || state == 'Cerrado')
+    if(value == 'Resuelto' || value == 'Cerrado')
     {
         json.resolution_time = localtimeString;         
     }
 
-    if(state == 'Falsa Alarma')
+    if(value == 'Falsa Alarma')
     {
         json.resolution_time = localtimeString; 
         json.comment += '\nFalsa Alarma'
         document.getElementById('card_comment').innerHTML = json.comment;  
     }
     //console.log(json)              
-    document.getElementById('card_state').innerHTML = state;  
-    socket.emit('state',json)
+    document.getElementById('card_state').innerHTML = value;  
+    console.log('state',json)
+    //socket.emit('state',json)
 }
 //Send Update Priority event to server
 function priority(priority)
@@ -811,7 +811,32 @@ function filter()
 }//filter function
 
 
+//keyboard shortcuts
+document.querySelector("#table").addEventListener("keydown", function(event) {
+    
+    event.stopPropagation();
+    if(!event.repeat){
+        
+        //--- Was a Shift-Q combo pressed?
+        if (event.shiftKey  && ( event.key === "q" || event.key === "Q")) {  // case sensitive
+            //state('En Progreso');
+        }
+         //--- Was a Shift-W combo pressed?
+         if (event.shiftKey  && ( event.key === "w" || event.key === "W")) {  // case sensitive
+            state('Resuelto');
+            handled = false
+        }
+        //--- Was a Shift-E combo pressed?
+          if (event.shiftKey  && ( event.key === "e" || event.key === "E")) {  // case sensitive
+            //state('Cerrado');
+        }
+        //--- Was a Shift-E combo pressed?
+        if (event.shiftKey  && ( event.key === "f" || event.key === "F")) {  // case sensitive
+            //state('Falsa Alarma');
+        }
+    }
 
+},true);
 
 
 

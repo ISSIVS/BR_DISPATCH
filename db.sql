@@ -10,7 +10,7 @@ CREATE DATABASE  dispatch
 
 -- DROP TABLE directory;
 
-CREATE TABLE IF NOT EXISTS directory
+CREATE TABLE directory
 (
   person_name text,
   email_address text,
@@ -28,22 +28,23 @@ ALTER TABLE directory
 
 -- DROP TABLE events;
 
-CREATE TABLE IF NOT EXISTS events
+CREATE TABLE events
 (
-  incident text, -- Intrusion detector, Armed, Alarmed, etc
+  id bigserial NOT NULL,
   object_id text,
-  params text,
+  type text, -- Usually CAM, SENSOR, PANEL, ETC
+  name text,
   "time" timestamp without time zone,
-  type text, -- Usually CAM
+  incident text, -- Intrusion detector, Armed, Alarmed, etc
+  params text,
   operator text,
   state text, -- New, In Progress, Resolved, Closed
   comment text, -- Operator comment abour incident
   response_time timestamp without time zone,
   resolution_time timestamp without time zone,
   priority text, -- High, Medium, Low
-  procedure text, -- ‘Started monitoring the incident’...
+  procedure text, -- â€˜Started monitoring the incidentâ€™...
   action text, -- Transfer,False Alarm,Export Incident
-  id bigserial NOT NULL,
   CONSTRAINT events_pkey PRIMARY KEY (id )
 )
 WITH (
@@ -57,11 +58,12 @@ COMMENT ON COLUMN events.type IS 'Usually CAM
 COMMENT ON COLUMN events.state IS 'New, In Progress, Resolved, Closed';
 COMMENT ON COLUMN events.comment IS 'Operator comment abour incident';
 COMMENT ON COLUMN events.priority IS 'High, Medium, Low';
-COMMENT ON COLUMN events.procedure IS '‘Started monitoring the incident’
-‘Stopped monitoring the incident’
-‘Escalated issue to supervisor’
-‘Called local site security personnel’
-‘Called central monitoring security personnel’
-‘Called 911’
-‘Called maintenance to look at camera related issue’';
+COMMENT ON COLUMN events.procedure IS 'â€˜Started monitoring the incidentâ€™
+â€˜Stopped monitoring the incidentâ€™
+â€˜Escalated issue to supervisorâ€™
+â€˜Called local site security personnelâ€™
+â€˜Called central monitoring security personnelâ€™
+â€˜Called 911â€™
+â€˜Called maintenance to look at camera related issueâ€™';
 COMMENT ON COLUMN events.action IS 'Transfer,False Alarm,Export Incident';
+

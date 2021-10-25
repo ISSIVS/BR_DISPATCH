@@ -3,7 +3,6 @@ fs = require('fs');
 const request = require('request');
 const config = require('./config')
 
-
 const cams = {
 "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
 "type": "CAM"
@@ -19,8 +18,11 @@ const partitions = {
   "type": "PARTITION"
    }
 }
-
-
+const panels = {
+  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
+  "type": "PANEL"
+   }
+}
 var username = config.restapi_user;
 var password = config.restapi_pass;
 
@@ -40,6 +42,9 @@ var optionspost= {
     }
   };
 
+
+//GET ACTUAL SUBSCRIPTIONS
+
 request.get(options, (err, res, body) => {
   if (err) {  console.log(err); console.log('fail request get'); return }
   var json = JSON.parse(body)
@@ -50,7 +55,7 @@ request.get(options, (err, res, body) => {
        if(json.data[p].callback == `http://127.0.0.1:${config.serverPort}/events`)           
        {
           deleteEvents(json.data[p].id)
-          console.log(json.data[p].id)
+          console.log('deleting...',json.data[p].id)
        }
     }
   }
@@ -68,18 +73,27 @@ function createSubscription()
   optionspost.json = cams;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
-    console.log(body);
+
   })
   optionspost.json = sensors;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
-    console.log(body);
+  
   })
   optionspost.json = partitions;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
-    console.log(body);
+
   })
+  optionspost.json = panels;
+  request.post(optionspost, (err, res, body) => {
+    if (err) {  console.log(err); console.log('fail request post'); return }
+ 
+  })
+  request.get(options, (err, res, body) => {
+    if (err) {  console.log(err); console.log('fail request get'); return }
+    var json = JSON.parse(body)
+  });
 }
 
 

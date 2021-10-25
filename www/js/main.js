@@ -255,37 +255,43 @@ function buildTable(json)
     var cam_select = document.getElementById('cam_select');
     var table = ''
     for(var i=0; i< json.length; i++){
-       table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+'">'
-       table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
-       table += '<td id="type" >'+json[i].type +'</td>'
-       table += '<td id="object_id" >'+json[i].object_id+'</td>'
-       if(json[i].type == 'CAM'){
-        var cam =  cameras.filter(id => id === json[i].object_id);
-        console.log(cam)
-
-        table += '<td id="name" >'+'</td>'
-       
-       }
-       if(json[i].type == 'SENSOR')
+        table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+'">'
+        table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
+        table += '<td id="type" >'+json[i].type +'</td>'
+        table += '<td id="object_id" >'+json[i].object_id+'</td>'
+        
+        if(json[i].type == 'CAM'){
+            console.log("id",json[i].object_id)
+            console.log('Object',Object.values(cameras.data))
+            var cam =  Object.values(cameras.data).filter( function(camera) { 
+                console.log(camera); 
+                if(camera.id === json[i].object_id) 
+                  return camera;    
+            });
+            console.log('CAMARA:',cam)
+            table += '<td id="name" >'+cam[0].name+'</td>'
+        }
+        else{
             table += '<td id="name" >'+json[i].name+'</td>'
-       table += '<td id="incident" >'+json[i].incident+'</td>'
-       table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
-       table += '<td id="state">'+json[i].state || ''+'</td>'
-       table += '<td id="operator">'+json[i].operator+'</td>'
-       if(json[i].response_time == null)
-        table += '<td id="responsetime"></td>'
-       else
-        table += '<td id="responsetime">'+new Date(json[i].response_time).toLocaleDateString("en-US", options2)+'</td>'
-       if(json[i].resolution_time == null)
-        table += '<td id="resolution_time"></td>'
-       else
-        table += '<td id="resolution_time">'+new Date(json[i].resolution_time).toLocaleDateString("en-US", options2)+'</td>'
-       table += '<td hidden="true" id="comment">'+json[i].comment+'</td>';
-       table += '<td hidden="true" id="action">'+json[i].action+'</td>';
-       table += '<td hidden="true" id="priority">'+json[i].priority+'</td>';
-       table += '<td hidden="true" id="procedure">'+json[i].procedure+'</td>';
-       table += '<td hidden="true"id="id_cam" >'+json[i].camera_id+'</td>'
-       table += '</tr>'
+        }
+        table += '<td id="incident" >'+json[i].incident+'</td>'
+        table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
+        table += '<td id="state">'+json[i].state || ''+'</td>'
+        table += '<td id="operator">'+json[i].operator+'</td>'
+        if(json[i].response_time == null)
+            table += '<td id="responsetime"></td>'
+        else
+            table += '<td id="responsetime">'+new Date(json[i].response_time).toLocaleDateString("en-US", options2)+'</td>'
+        if(json[i].resolution_time == null)
+            table += '<td id="resolution_time"></td>'
+        else
+            table += '<td id="resolution_time">'+new Date(json[i].resolution_time).toLocaleDateString("en-US", options2)+'</td>'
+        table += '<td hidden="true" id="comment">'+json[i].comment+'</td>';
+        table += '<td hidden="true" id="action">'+json[i].action+'</td>';
+        table += '<td hidden="true" id="priority">'+json[i].priority+'</td>';
+        table += '<td hidden="true" id="procedure">'+json[i].procedure+'</td>';
+        table += '<td hidden="true"id="id_cam" >'+json[i].camera_id+'</td>'
+        table += '</tr>'
     }
     try{
         const regex = /null/ig;

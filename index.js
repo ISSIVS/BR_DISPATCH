@@ -356,9 +356,11 @@ function classification(e, callback) {
 			}
 		}
 		//SENSORS
-		if (e.type == "SENSOR") {
+		else{
 			e.incident = e.params.comment
 		}
+		
+
 		callback(e);
 
 	}

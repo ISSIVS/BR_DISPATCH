@@ -85,36 +85,36 @@ app.post('/events', function (req, res) {
 //socket io connection
 io.on('connection', function (socket) {
 	getCameras(function (res) {
-		console.log('Sending cameras to HTML5 ')
+		//console.log('Sending cameras to HTML5 ')
 		socket.emit('getCameras', res);
-		message.select('events', 100000, function (res) {
+		message.select('events', 1000, function (res) {
 			//Send Events to html
-			console.log('Emitting to HTML5 ')
+			//console.log('Emitting to HTML5 ')
 			socket.emit('newEvent', res);
 		})
 	})
 
-	message.select('directory', 100000, function (res) {
+	message.select('directory', 1000, function (res) {
 		//Send Directory to html
-		console.log('Emitting to HTML5 ')
+		//console.log('Emitting to HTML5 ')
 		socket.emit('directory', res);
 	})
 
 
 
-	console.log('a user connected');
+	//console.log('a user connected');
 	socket.on('disconnect', () => {
-		console.log('user disconnected');
+		//console.log('user disconnected');
 	});
 
 	//Change State
 	socket.on('state', (json) => {
 
 		message.update(json.id, 'events', json, function () {
-			message.select('events', 100, function (res) {
+			message.select('events', 1000, function (res) {
 				//Send Events to html 
-				console.log(json)
-				console.log('Emitting to HTML5 ')
+				//console.log(json)
+				//console.log('Emitting to HTML5 ')
 				io.emit('newEvent', res);
 			})
 		});
@@ -133,7 +133,7 @@ io.on('connection', function (socket) {
 	//Reports
 	socket.on('query', (json) => {
 		query(json, function (res) {
-			console.log('callback query')
+			//console.log('callback query')
 			socket.emit('queryResult', res)
 		})
 	});
@@ -144,7 +144,7 @@ io.on('connection', function (socket) {
 		message.insert('directory', json, function () {
 			message.select('directory', 100, function (res) {
 				//Send Directory
-				console.log('Emitting to HTML5 ')
+				//console.log('Emitting to HTML5 ')
 				socket.emit('directory', res);
 			})
 		});
@@ -155,7 +155,7 @@ io.on('connection', function (socket) {
 		message._delete('directory', json, function () {
 			message.select('directory', 100, function (res) {
 				//Send Directory
-				console.log('Emitting to HTML5 ')
+				//console.log('Emitting to HTML5 ')
 				io.emit('directory', res);
 			})
 		});
@@ -166,7 +166,7 @@ io.on('connection', function (socket) {
 		console.log('getDirectory ')
 		message.select('directory', 100, function (res) {
 			//envio a html las filas
-			console.log('Emitting to HTML5 ')
+			//console.log('Emitting to HTML5 ')
 			socket.emit('directory', res);
 		})
 	});
@@ -200,9 +200,9 @@ io.on('connection', function (socket) {
 var intServer = new integrationServer.integrationServer("127.0.0.1", 3015)
 
 function getObject(body, callback) {
-	console.log('INFO', body )
+	//console.log('INFO', body )
 	
-	console.log('INFO', 'Getting object...')
+	//console.log('INFO', 'Getting object...')
 	intServer.getObject(body, function (res) {
 		console.log(res)
 		callback(res)
@@ -210,8 +210,8 @@ function getObject(body, callback) {
 }
 
 function getCameras(callback) {
-	console.log('INFO', 'Getting cameras...')
-	console.log(configuration.ip, configuration.restapi_port, configuration.restapi_user, configuration.restapi_pass)
+	//console.log('INFO', 'Getting cameras...')
+	//console.log(configuration.ip, configuration.restapi_port, configuration.restapi_user, configuration.restapi_pass)
 	var rest = new restapi.restapi(configuration.ip, configuration.restapi_port, configuration.restapi_user, configuration.restapi_pass);
 	rest.getRequest('api/v1/cameras', function (res) {
 		//console.log(res)

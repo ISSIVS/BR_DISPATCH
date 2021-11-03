@@ -21,7 +21,7 @@ socket.on('directory', function(msg) {
 });
 socket.on('getCameras', function(msg) {
     //console.log('receiving cameras')
-    buildCameras(msg)
+    //buildCameras(msg)
 });
 socket.on('queryResult', function(msg) {
     //console.log('receiving report')
@@ -84,6 +84,8 @@ function report(){
 }
 var cameras;
 var coordinates = [];
+
+
 function buildCameras(msg){
     var json = JSON.parse(msg);
     cameras = json;
@@ -300,14 +302,14 @@ function buildTable(json)
         filter();
     }
     catch(e){
-        document.getElementById('test').innerHTML = "Error 298: "+ e
+        document.getElementById('test').innerHTML = "Error 303: "+ e
     }
 
     ready($);
 }
 
 $('.dropdown-toggle').dropdown();
-$('.dropdown-toggle').dropdown();
+
 //Document update functions JQUERY when new event
 function ready($)
 {
@@ -441,6 +443,7 @@ $(".closeCardExport").click(function(e)
 //dropdowns clicks functions
 $(".dropdown-item").click(function(e)
 {
+    alert( "Handler for .click() called." );
     var action = e.currentTarget.innerHTML;
     switch(action){
         case 'Transfer':
@@ -813,7 +816,7 @@ function filter()
 
 //keyboard shortcuts
 document.querySelector("#table").addEventListener("keydown", function(event) {
-    
+    console.log(event)
     event.stopPropagation();
     if(!event.repeat){
         
@@ -825,6 +828,7 @@ document.querySelector("#table").addEventListener("keydown", function(event) {
          if (event.shiftKey  && ( event.key === "w" || event.key === "W")) {  // case sensitive
             state('Resuelto');
             handled = false
+            return false;
         }
         //--- Was a Shift-E combo pressed?
           if (event.shiftKey  && ( event.key === "e" || event.key === "E")) {  // case sensitive

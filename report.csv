@@ -1,4 +1,1 @@
 id;camera_id;incident;time;state;priority;operator;response_time;resolution_time;comment;
-3;10;Camera event;8/9/2021, 5:59:06 PM;New;null;null;null;null;null
-2;10;Camera event;8/9/2021, 5:57:30 PM;Resolved;null;root;Mon Aug 09 2021 17:58:50 GMT-0500 (Colombia Standard Time);Mon Aug 09 2021 17:58:50 GMT-0500 (Colombia Standard Time);
-1;10;Camera event;8/9/2021, 5:56:40 PM;Resolved;null;External User;Mon Aug 09 2021 17:58:02 GMT-0500 (Colombia Standard Time);Mon Aug 09 2021 17:58:02 GMT-0500 (Colombia Standard Time);falsa alarma

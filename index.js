@@ -29,7 +29,6 @@ server.listen(port || 3000, () => {
 	console.log(`listening on *: ${port}`);
 });
 
-// 
 // HOMEPAGE
 app.get('/', function (req, res) {
 	res.sendFile('index.html');
@@ -60,6 +59,8 @@ app.post('/events', function (req, res) {
 						console.log("GetObject Result:",res)
 						console.log("NAME",res.name)
 						req.body[0].name  = res.name;
+						req.body[0].priority = res.params.tp_name;
+						req.body[0].cam_id = res.params.camera_id;
 						console.log("body",req.body[0])
 						message.insert("events", req.body[0], function () {
 							//actualizo HTML5
@@ -197,7 +198,7 @@ io.on('connection', function (socket) {
 	});
 });
 
-var intServer = new integrationServer.integrationServer("127.0.0.1", 3015)
+var intServer = new integrationServer.integrationServer("127.0.0.1", 3016)
 
 function getObject(body, callback) {
 	//console.log('INFO', body )
@@ -317,8 +318,6 @@ function query(data, callback) {
 
 
 }
-
-
 
 function classification(e, callback) {
 	try {

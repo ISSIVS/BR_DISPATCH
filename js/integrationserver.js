@@ -40,7 +40,7 @@ class integrationServer{
         };
         console.log("GetObject",json)
 		request(options, function(err, res, body) {
-            callback(body)})
+            callback(body)})    
 
 	}
 

@@ -19,9 +19,9 @@ socket.on('directory', function(msg) {
     //console.log('receiving directory')
     buildNames(msg)
 });
-socket.on('getCameras', function(msg) {
+socket.on('getCameras', async function(msg) {
     //console.log('receiving cameras')
-    //buildCameras(msg)
+   // await buildCameras(msg)
 });
 socket.on('queryResult', function(msg) {
     //console.log('receiving report')
@@ -250,30 +250,27 @@ function btnProcedure(event){
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////TABLA INCIDENTES/////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 
 function buildTable(json)
 {
    
-    var cam_select = document.getElementById('cam_select');
+    //var cam_select = document.getElementById('cam_select');
     var table = ''
     for(var i=0; i< json.length; i++){
         table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+' onkeydown=keydown()">'
-        table += '<td scope="row" width="100px" id="id">'+json[i].id+'</th>';
+        table += '<td scope="row" width="100px" id="id" hidden = "true">'+json[i].id+'</th>';
+        if(json[i].priority == "Alta")
+             table += '<td id="priority" width="100px" ><button type="button" class="btn btn-danger"></button></td>'
+        else if(json[i].priority == "Media")
+            table += '<td id="priority" width="100px"><button type="button" class="btn btn-warning"></button></td>'
+        else
+            table += '<td id="priority" width="100px"><button type="button" class="btn btn-primary"></button></td>'
         table += '<td id="type" >'+json[i].type +'</td>'
         table += '<td id="object_id" >'+json[i].object_id+'</td>'
-        
-        if(json[i].type == 'CAM'){
-            var cam =  Object.values(cameras.data).filter( function(camera) { 
-            
-                if(camera.id === json[i].object_id) 
-                  return camera;    
-            });
-          
-            table += '<td id="name" >'+cam[0].name+'</td>'
-        }
-        else{
-            table += '<td id="name" >'+json[i].name+'</td>'
-        }
+        table += '<td id="name" >'+json[i].name+'</td>'
         table += '<td id="incident" >'+json[i].incident+'</td>'
         table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
         table += '<td id="state">'+json[i].state || ''+'</td>'
@@ -342,7 +339,7 @@ $(document).ready(function($) {
         var c  =  document.getElementById('card_camera').innerHTML=camera;  
         var p  =  document.getElementById('card_priority').innerHTML=priority;  
         var pr =  document.getElementById('card_procedure').innerHTML=procedure ;  
-        var l  =  document.getElementById('card_location').innerHTML=coordinates[id_cam];
+        var l  =  document.getElementById('card_location').innerHTML='';
         var s  =  document.getElementById('card_state').innerHTML=state;  
         var i  =  document.getElementById('card_id').innerHTML=id_cam;  
         var co = document.getElementById('card_comment').value=comment;  
@@ -443,7 +440,7 @@ $(".closeCardExport").click(function(e)
 //dropdowns clicks functions
 $(".dropdown-item").click(function(e)
 {
-    alert( "Handler for .click() called." );
+   
     var action = e.currentTarget.innerHTML;
     switch(action){
         case 'Transfer':
@@ -614,7 +611,7 @@ function state(value)
     //console.log(json)              
     document.getElementById('card_state').innerHTML = value;  
     console.log('state',json)
-    //socket.emit('state',json)
+    socket.emit('state',json)
 }
 //Send Update Priority event to server
 function priority(priority)

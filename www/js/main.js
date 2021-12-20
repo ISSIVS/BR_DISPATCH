@@ -12,7 +12,7 @@ var cameras;
 
 var socket = io();
 socket.on('newEvent', function(msg) {
-   // console.log('receiving event')
+    console.log('receiving event :',msg)
     buildTable(msg)
 });
 socket.on('directory', function(msg) {
@@ -263,15 +263,23 @@ function buildTable(json)
         table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+' onkeydown=keydown()">'
         table += '<td scope="row" width="100px" id="id" hidden = "true">'+json[i].id+'</th>';
         if(json[i].priority == "Alta")
-             table += '<td id="priority" width="100px" ><button type="button" class="btn btn-danger"></button></td>'
+             table += '<td id="priority" width="100px" value="Alta"><center><i class="fa fa-exclamation-triangle"></i></td>'
         else if(json[i].priority == "Media")
-            table += '<td id="priority" width="100px"><button type="button" class="btn btn-warning"></button></td>'
+            table += '<td id="priority" width="100px" value="Media"><center><i class="fa fa-exclamation-circle"></i></td>'
         else
-            table += '<td id="priority" width="100px"><button type="button" class="btn btn-primary"></button></td>'
+            table += '<td id="priority" width="100px" value="Baja"><center><i class="fa fa-info-circle" aria-hidden="true"></i></td>'
         table += '<td id="type" >'+json[i].type +'</td>'
         table += '<td id="object_id" >'+json[i].object_id+'</td>'
         table += '<td id="name" >'+json[i].name+'</td>'
-        table += '<td id="incident" >'+json[i].incident+'</td>'
+        //LPR
+        if(json[i].type == 'LPR_LOGIC'){
+            var params  = JSON.parse(json[i].params)
+            table += '<td id="incident" >Placa:'+params.number +', Info:'+params.information_utf8 +'</td>'
+        }
+        //OTHERS
+        else{
+            table += '<td id="incident" >'+json[i].incident+'</td>'
+        }
         table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
         table += '<td id="state">'+json[i].state || ''+'</td>'
         table += '<td id="operator">'+json[i].operator+'</td>'
@@ -312,8 +320,7 @@ function ready($)
 {
   
 
-
-    //Reselect the active row when a new EVENT
+//Reselect the active row when a new EVENT
     $("tr[tabindex=" + tabindex + "]").addClass("table-selected").siblings().removeClass("table-selected"); 
     
     var item = document.getElementById("transferCard");
@@ -395,20 +402,25 @@ function btnDir(e)
 //-------------------------- JQUERYS Section -----------------
 
 //Activate Multiple Select filter for Incidents Type
-$('.select').selectpicker({noneSelectedText: 'Tipo de incidente',width:'100%'})
+$('.select').selectpicker({noneSelectedText: 'Tipo de prioridad',width:'100%'})
 
 //Close Inicidents TAB  deselect rows and goto top table
 $(".closeCard").click(function(e) 
 {
-        var rows = document.getElementById('incidentCard');
+      
+        var rows = document.getElementById('incidentCard');     
         var table = document.getElementById('tablediv');
         if (!rows.classList.contains("hidden")) {
+            
                 rows.classList.add("hidden");
                 table.classList.replace('col-md-9','col-md-12')
-                $('.table-row').siblings().removeClass("table-selected");
+                
+                $('.table-row').removeClass("table-selected");
                 $('.table-row').first().focus(); 
-                tabindex=0;
+                
+                console.log('Close')
         }
+      
 });
 
 //Close Transfer Tab
@@ -443,7 +455,7 @@ $(".dropdown-item").click(function(e)
    
     var action = e.currentTarget.innerHTML;
     switch(action){
-        case 'Transfer':
+        case 'Transferir':
             transfer()
         break;
         case 'Export Evidence':
@@ -510,6 +522,7 @@ $(function () {
 //Transfer click 
 function transfer()
 {
+    console.log('Transfer')
     var incidents = document.getElementById('incidentCards');
     var transfer = document.getElementById('transferCard');
     if (transfer.classList.contains("hidden")) {
@@ -751,19 +764,27 @@ function filter()
         tr = table.getElementsByTagName("tr");
         
         for (i = 1; i < tr.length; i++) {
-            td1 = tr[i].getElementsByTagName("td")[1];   //Camera Name
+            td1 = tr[i].getElementsByTagName("td")[4];   //Name
             td2 = tr[i].getElementsByTagName("td")[9];   //Type of Incident
-            td3 = tr[i].getElementsByTagName("td")[6];   //State
+            td3 = tr[i].getElementsByTagName("td")[7];   //State
+            td4 = tr[i].getElementsByTagName("td")[3];   //ID
+            td5 = tr[i].getElementsByTagName("td")[1];   //Priority
+           // td5 = td5.getElementsByTagName("button")[0];   //ID
             
             //filter By Name
             if (td1 &&  filtername!=""){
-                txtValue = td1.textContent || td1.innerText; //2
-                f1 =  txtValue.toUpperCase().indexOf(filtername) > -1
+                txtValue = td1.textContent || td1.innerText ; //2
+                txtValue2 = td4.textContent || td4.innerText ; //2
+                var f_name =  txtValue.toUpperCase().indexOf(filtername) > -1
+                var f_id =  txtValue2.toUpperCase().indexOf(filtername) > -1
+                f1 = f_name || f_id
             }
             else f1=true;
+
             //filter By Incident
-            if (td2 &&  filterincident!="") {
-                txtValue = td2.textContent || td2.innerText; 
+            if (td5 &&  filterincident!="") {
+                txtValue = td5.getAttribute( 'value' );
+                console.log('txtValue:',txtValue) 
                 for (var p in filterincident)
                 {
                     if(filterincident[p].toUpperCase()== "ALL"){
@@ -781,6 +802,7 @@ function filter()
                 }
             }
             else f2=true
+            
     
             //filter By State
             if (td3 && filterstate!="") {
@@ -792,8 +814,14 @@ function filter()
             //Check  filters
             if (f1 && f2 && f3 && td3) {
                 txtValue = td3.textContent || td3.innerText; 
-                if(txtValue =='Nuevo' || txtValue == 'En progreso')
+                
+                
+                if(txtValue =='Nuevo' || txtValue == 'En progreso'){
                     activeIncidents++;
+                    //if(priorityValue =='Nuevo' || txtValue == 'En progreso')
+                    //    activeIncidents++;
+                }
+
                 tr[i].style.display = "";
             } 
             else {

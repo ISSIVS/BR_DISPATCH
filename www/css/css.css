@@ -12,6 +12,18 @@ h2, h5{
 body{
 
 }
+.fa-exclamation-triangle {
+  font-size: 30px;
+  color:  rgb(255, 0, 0);
+}
+.fa-exclamation-circle {
+  font-size: 30px;
+  color:  rgb(255, 230, 1);
+}
+.fa-info-circle {
+  font-size: 30px;
+  color:  rgb(1, 103, 255);
+}
  .table
  {
    margin-top: 20px;
@@ -114,7 +126,7 @@ body{
    color:  #fff;
 }
 .btn-group{
-  padding-top: 10px
+  padding-top: 10px;
   margin: auto;
   display: flex;
   flex-direction: row;
@@ -173,10 +185,10 @@ body{
 
 .dropdown:hover .dropdown-menu {
     display: block;
-    margin-top: 0; // remove the gap so it doesn't close
+    margin-top: 0; 
  }
  .navbar-text{
-  margin-right: 20px
+  margin-right: 20px;
    color: rgba(255,255,255,0.5);
  }
 

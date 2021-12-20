@@ -33,7 +33,7 @@
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="directory()"><i class="fa fa-address-book" aria-hidden="true"></i> Directorio</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item hidden">
             <a class="nav-link" href="#" onclick="report()"><i class="fa fa-download" aria-hidden="true"></i> Reportes</a>
           </li>
         </ul>
@@ -45,24 +45,18 @@
 <div class="row incidents" id="incidents">
     <!-- Filter by name -->
     <div class="col-md-3 filters" id="filters">
-      <input type="text" style="width: 100%" id="filterbyname" onkeyup="filterByName()" placeholder="Filtrar por nombre..." title="Type in a name">
+      <input type="text" style="width: 100%" id="filterbyname" onkeyup="filterByName()" placeholder="Filtrar por nombre o ID..." title="Type in a name">
     </div>
-    <!-- Filter by incident -->
+    <!-- Filter by Priority -->
     <div class="col-md-3 filters" id="filters">
                     <select class="selectpicker select"  multiple data-live-search="true"  onchange="filterByIncident(this)" style="width: 100%;" tabindex="-1" aria-hidden="true" id="filterbyincident">
-                      <option value="MD_START">Deteccion de Movimiento Iniciado</option>
-                      <option value="MD_STOP">Deteccion de Movimiento Finalizado<</option>
-                      <option value="ARMED">Camara Armada</option>
-                      <option value="DISARMED">Camara Desarmada</option>
-                      <option value="ATTACH">Camara Conectada</option>
-                      <option value="DETACH">Camara Desconectada</option>
-                      <option value="REC">Grabancion Iniciada</option>
-                      <option value="REC_ERROR">Error de Grabacionr</option>
-                      <option value="REC_STOP">Grabacion Detenida</option>
-                      <option value="VCA_EVENT">Evento de Analitica</option>
+                      <option value="Alta">Alta</option>
+                      <option value="Media">Media</option>
+                      <option value="Baja">Baja</option>
                     </select>
               
     </div>
+    -->
     <!-- Filter by State -->
     <div class="col-md-3 filters" id="filters">
      <select class="form-control select2 select2-hidden-accessible" style="width: 100%;" onchange="filterByState(this)" data-select2-id="0" tabindex="-1" aria-hidden="true" id="filterbystate">
@@ -78,7 +72,7 @@
       <table id="table" class="table table-incidents table-hover tablediv table-condensed table-dark table-responsive-md">
         <thead>
           <tr class="clickable-row">
-            <th data-field="id" width="100px">ID</th>
+            <th data-field="id" width="100px">Prioridad</th>
             <th data-field="name" >Tipo de Objeto</th>
             <th data-field="name" >Id de Objeto</th>
             <th data-field="name" >Nombre</th>
@@ -95,6 +89,7 @@
         </tbody>
       </table>
     </div>
+    
      <div class="col-md-3 hidden" id="incidentCard" >
       <div class='card'id="incidentCards" >
         <div class="row">
@@ -152,13 +147,13 @@
                 Procedimiento
               </button>
               <div class="dropdown-menu">
-                   <a class="dropdown-item" href="#">Started monitoring the incident</a>
+                    <a class="dropdown-item" href="#">Started monitoring the incident</a>
                     <a class="dropdown-item" href="#">Stopped monitoring the incident</a>
-                     <a class="dropdown-item" href="#">Escalated issue to supervisor</a>
-                      <a class="dropdown-item" href="#">Called local site security personnel</a>
-                       <a class="dropdown-item" href="#">Called central monitoring security personnel</a>
-                       <a class="dropdown-item" href="#">Called 911</a>
-                       <a class="dropdown-item" href="#">Called maintenance to look at camera related issue</a>
+                    <a class="dropdown-item" href="#">Escalated issue to supervisor</a>
+                    <a class="dropdown-item" href="#">Called local site security personnel</a>
+                    <a class="dropdown-item" href="#">Called central monitoring security personnel</a>
+                    <a class="dropdown-item" href="#">Called 911</a>
+                    <a class="dropdown-item" href="#">Called maintenance to look at camera related issue</a>
 
               </div>
             </div></span></div>
@@ -180,22 +175,14 @@
                   </button>
                   <button class="btn btn-primary " onclick="live()" type="button">En vivo <i class="fa fa-video-camera" aria-hidden="true"></i>
                   </button>
-                  <div class="btn-group dropleft">
+                  <div class="btn btn-info btn-group dropleft">
                   <button class="btn btn-info  dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Acciones
                   </button>
                       <ul class="dropdown-menu">
                           <a class="dropdown-item" href="#">Transferir</a> 
                           <a class="dropdown-item" href="#">Exportar Evidencia</a> 
                           <!-- Submenu Priority -->
-                          <div class="dropdown-divider"></div>
-                         
-                          <a class="dropdown-menu  dropdown-toggle"  href="#" data-toggle="dropdown">Cambiar Prioridad</a>
-                          <div class="dropdown-submenu">
-                              <a  class="dropdown-item" href="#">Baja Prioridad</a>
-                              <a  class="dropdown-item"href="#">Media Prioridad</a>
-                              <a  class="dropdown-item"href="#">Alta Prioridad</a>
-                          </div>
-                         
+
                           <!-- Submenu State -->
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown"  >Cambiar Estado</a>

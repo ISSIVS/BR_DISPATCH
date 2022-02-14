@@ -30,13 +30,11 @@ ALTER TABLE directory
 
 CREATE TABLE events
 (
-  id bigserial NOT NULL,
-  object_id text,
-  type text, -- Usually CAM, SENSOR, PANEL, ETC
-  name text,
-  "time" timestamp without time zone,
   incident text, -- Intrusion detector, Armed, Alarmed, etc
+  object_id text,
   params text,
+  "time" timestamp without time zone,
+  type text, -- Usually CAM
   operator text,
   state text, -- New, In Progress, Resolved, Closed
   comment text, -- Operator comment abour incident
@@ -45,6 +43,9 @@ CREATE TABLE events
   priority text, -- High, Medium, Low
   procedure text, -- â€˜Started monitoring the incidentâ€™...
   action text, -- Transfer,False Alarm,Export Incident
+  id bigserial NOT NULL,
+  name text,
+  cam_id text,
   CONSTRAINT events_pkey PRIMARY KEY (id )
 )
 WITH (
@@ -67,3 +68,21 @@ COMMENT ON COLUMN events.procedure IS 'â€˜Started monitoring the incidentâ�
 â€˜Called maintenance to look at camera related issueâ€™';
 COMMENT ON COLUMN events.action IS 'Transfer,False Alarm,Export Incident';
 
+-- Table: logs
+
+-- DROP TABLE logs;
+
+CREATE TABLE logs
+(
+  id bigserial NOT NULL,
+  incident_id bigint,
+  "time" timestamp without time zone,
+  operator text,
+  event text,
+  CONSTRAINT logs_pkey PRIMARY KEY (id )
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE logs
+  OWNER TO postgres;

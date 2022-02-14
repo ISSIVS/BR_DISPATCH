@@ -5,12 +5,13 @@ const config = require('./config')
 
 const cams = {
 "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-"type": "CAM"
+"type": "FACE_X_SERVER",
+"action": "MATCH"
 }
 }
 const sensors = {
   "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-  "type": "SENSOR"
+  "type": "CAM"
   }
 }
 const partitions = {
@@ -75,11 +76,13 @@ function createSubscription()
     if (err) {  console.log(err); console.log('fail request post'); return }
 
   })
+  
   optionspost.json = sensors;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
   
   })
+  /*
   optionspost.json = partitions;
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
@@ -89,7 +92,8 @@ function createSubscription()
   request.post(optionspost, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request post'); return }
  
-  })
+  })*/
+
   request.get(options, (err, res, body) => {
     if (err) {  console.log(err); console.log('fail request get'); return }
     var json = JSON.parse(body)

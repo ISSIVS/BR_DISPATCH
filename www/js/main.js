@@ -8,7 +8,7 @@ var options4 = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
 //global variables
 var name_selected;
 var cameras;
-
+var coordinates = [];
 
 var socket = io();
 socket.on('newEvent', function(msg) {
@@ -64,10 +64,6 @@ function directory(){
 
 }
 
-
-
-
-
 function report(){
 
     $(".nav-item").click(function(e) {
@@ -82,8 +78,7 @@ function report(){
     inc.classList.add("hidden")
 
 }
-var cameras;
-var coordinates = [];
+
 
 
 function buildCameras(msg){
@@ -262,7 +257,34 @@ function buildTable(json)
     for(var i=0; i< json.length; i++){
         table += '<tr class="table-row clickable-row" tabindex="'+json[i].id+' onkeydown=keydown()">'
         table += '<td scope="row" width="100px" id="id" hidden = "true">'+json[i].id+'</th>';
-        if(json[i].priority == "Alta")
+
+        json[i].camera_id = json[i].cam_id;
+
+        if(json[i].type == 'FACE_X_SERVER'){
+            var params = JSON.parse(json[i].incident)
+            json[i].camera_id = params.cam_id;
+            switch(params.list.priority) {
+                case 0:
+                    json[i].priority = "Alta"
+                    break;
+                case 1:
+                    json[i].priority = "Media"
+                    break;
+                case 2:
+                    json[i].priority = "Baja"
+                    break;
+
+            }
+            json[i].camera_id = params.cam_id;
+            json[i].name = `<img src="${params.detection._links.detection_image}" alt="User Img" class="user_img">` + " " + params.person.first_name + " " +  params.person.last_name;
+            json[i].incident = params.person.notes
+                
+        console.log(params)
+        }
+        if(json[i].type == 'CAM'){
+        
+        }
+        if (json[i].priority == "Alta")
              table += '<td id="priority" width="100px" value="Alta"><center><i class="fa fa-exclamation-triangle"></i></td>'
         else if(json[i].priority == "Media")
             table += '<td id="priority" width="100px" value="Media"><center><i class="fa fa-exclamation-circle"></i></td>'
@@ -271,15 +293,7 @@ function buildTable(json)
         table += '<td id="type" >'+json[i].type +'</td>'
         table += '<td id="object_id" >'+json[i].object_id+'</td>'
         table += '<td id="name" >'+json[i].name+'</td>'
-        //LPR
-        if(json[i].type == 'LPR_LOGIC'){
-            var params  = JSON.parse(json[i].params)
-            table += '<td id="incident" >Placa:'+params.number +', Info:'+params.information_utf8 +'</td>'
-        }
-        //OTHERS
-        else{
-            table += '<td id="incident" >'+json[i].incident+'</td>'
-        }
+        table += '<td id="incident" >'+json[i].incident+'</td>'
         table += '<td id="time" >'+new Date(json[i].time).toLocaleDateString("en-US", options2)+'</td>'
         table += '<td id="state">'+json[i].state || ''+'</td>'
         table += '<td id="operator">'+json[i].operator+'</td>'
@@ -327,8 +341,27 @@ function ready($)
     var hasClass = item.classList.contains( 'hidden');
     if(hasClass)
     $("tr[tabindex=" + tabindex + "]").focus();
+
+
+/////////////////////////////////
     //Click Incidents Rows
+////////////////////////////////
+
 $(document).ready(function($) {
+    $(document).on("dblclick",".table-row",function() {
+
+        try{   
+            var cam_id  =  document.getElementById('card_id').innerHTML;
+            console.log(cam_id);
+            var date = document.getElementById('card_incidentDate').innerHTML
+                    ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"ADD_SEQUENCE",'{"mode":"1x1","seq":"'+cam_id+'"}')  
+                    }
+            catch(e){
+                document.getElementById("test").innerHTML =e;       
+            }
+
+    });
+
     $(".table-row").click(function(e) {
         $(this).addClass("table-selected").siblings().removeClass("table-selected");
         //variables for Incidents TAB  

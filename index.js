@@ -16,14 +16,20 @@ const csv = require('./js/csv');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "www")));
-app.all('*', function (req, res, next) {
-	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "X-Requested-With");
-	next();
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'origin-list');
+	res.setHeader('Access-Control-Allow-Origin', 'http://192.168.10.105:21093/v1/spotter/person/1');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
 });
+
 
 // ---- START UP SERVER -----
 var port = configuration.serverPort;
+
+var intServer = new integrationServer.integrationServer("127.0.0.1", configuration.integrationPort)
 
 server.listen(port || 3000, () => {
 	console.log(`listening on *: ${port}`);
@@ -53,6 +59,7 @@ app.post('/events', function (req, res) {
 				req.body[0].state = 'Nuevo';
 				req.body[0].params = JSON.stringify(req.body[0].params);
 				delete req.body[0].id;
+				
 			
 				getObject(req.body[0], function (res){
 					if(res){
@@ -60,8 +67,9 @@ app.post('/events', function (req, res) {
 						console.log("NAME",res.name)
 						req.body[0].name  = res.name;
 						req.body[0].priority = res.params.tp_name;
-						req.body[0].cam_id = res.params.camera_id;
+						req.body[0].cam_id = res.params.camera_id || res.id ;
 						console.log("body",req.body[0])
+						
 						message.insert("events", req.body[0], function () {
 							//actualizo HTML5
 							message.select('events', 1000, function (res) {
@@ -69,8 +77,10 @@ app.post('/events', function (req, res) {
 								io.emit('newEvent', res);
 							});
 						});
+						
 					}
 				});
+				
 		});
 	 }
 	}
@@ -198,7 +208,7 @@ io.on('connection', function (socket) {
 	});
 });
 
-var intServer = new integrationServer.integrationServer("127.0.0.1", 3016)
+
 
 function getObject(body, callback) {
 	//console.log('INFO', body )

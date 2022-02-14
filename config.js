@@ -13,6 +13,7 @@ var mail_pass = '960516[[';
 
 //Dashboard Port #
 var Server_port = 8333;
+var integration_port = 3016;
 //use this port to access via webbrowser to SecurOS EventViewer HTML5
 //for Example http://127.0.0.1:8333
 
@@ -23,6 +24,7 @@ exports.restapi_user = RestApi_user;
 exports.restapi_pass = RestApi_pass;
 exports.ip   = Securos_Server_IP;
 exports.serverPort = Server_port;
+exports.integrationPort = integration_port;
 
 exports.mailfrom = mailfrom;
 exports.mail_user = mail_user;

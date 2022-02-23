@@ -66,7 +66,7 @@ app.post('/events', function (req, res) {
 						console.log("GetObject Result:",res)
 						console.log("NAME",res.name)
 						req.body[0].name  = res.name;
-						req.body[0].priority = res.params.tp_name;
+						req.body[0].priority = res.params.tp_name || "Baja";
 						req.body[0].cam_id = res.params.camera_id || res.id ;
 						console.log("body",req.body[0])
 						

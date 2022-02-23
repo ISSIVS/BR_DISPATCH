@@ -943,9 +943,20 @@ function starSecurOS(){
 //Play Button
 function play()
 {
-    try{   
     var cam_id  =  document.getElementById('card_id').innerHTML;
-    console.log(cam_id);
+    var expresionRegular = /\s*,\s*/;
+    var listaCamaras = cam_id.split(expresionRegular);
+    var mode = ''
+    if(listaCamaras.length>1)
+        mode = '2x2'
+    else    
+        mode = '1x1'
+        
+    console.log('{"mode":'+mode+',"seq":"'+cam_id.replace(",","|")+'"}');
+    try{   
+   
+    
+    
     var date = document.getElementById('card_incidentDate').innerHTML
     var time  =  document.getElementById('card_incidentTime').innerHTML
     var isoDateTime = new Date(date + ' '+ time);
@@ -953,7 +964,7 @@ function play()
     var localTime = isoDateTime.toLocaleTimeString('us',{hour: '2-digit', minute: '2-digit', second: '2-digit',mili: '2-digit', hour12: false});
             var localTime = localTime +':'+ isoDateTime.getMilliseconds();
             var localtimeString = localDate + ' ' + localTime;
-            ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"ADD_SEQUENCE",'{"mode":"1x1","seq":"'+cam_id+'"}')  
+            ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"ADD_SEQUENCE",'{"mode":"'+mode+'","seq":"'+cam_id.replace(",","|")+'"}')  
             ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"SEEK",'{"date":"'+localDate+'","time":"'+localTime+'","cam":"'+cam_id+'"}')  
             }
     catch(e){
@@ -963,11 +974,20 @@ function play()
 //Live Button
 function live()
 {
-    try{   
     var cam_id  =  document.getElementById('card_id').innerHTML;
-    console.log(cam_id);
-    var date = document.getElementById('card_incidentDate').innerHTML
-            ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"ADD_SEQUENCE",'{"mode":"1x1","seq":"'+cam_id+'"}')  
+    var expresionRegular = /\s*,\s*/;
+    var listaCamaras = cam_id.split(expresionRegular);
+    var mode = ''
+    if(listaCamaras.length>1)
+        mode = '2x2'
+    else    
+        mode = '1x1'
+        
+    console.log('{"mode":'+mode+',"seq":"'+cam_id.replace(",","|")+'"}');
+
+    try{   
+
+            ISScustomAPI.sendReact("MEDIA_CLIENT", Media_client,"ADD_SEQUENCE",'{"mode":"'+mode+'","seq":"'+cam_id.replace(",","|")+'"}')  
             }
     catch(e){
         document.getElementById("test").innerHTML =e;       

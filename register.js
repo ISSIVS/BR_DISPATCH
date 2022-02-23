@@ -1,31 +1,23 @@
 const http = require('http')
 fs = require('fs');
 const request = require('request');
-const config = require('./config')
+const config = require('./js/config')
 
-const cams = {
-"callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-"type": "FACE_X_SERVER",
-"action": "MATCH"
-}
-}
-const sensors = {
-  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-  "type": "CAM"
-  }
-}
-const partitions = {
-  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-  "type": "PARTITION"
-   }
-}
-const panels = {
-  "callback": "http://127.0.0.1:"+config.serverPort+"/events", "filter": {
-  "type": "PANEL"
-   }
-}
 var username = config.restapi_user;
 var password = config.restapi_pass;
+
+//////////////////////////////////////////////
+//EDIT FOR EACH EVENT SUBSCRIPTION
+var events = [{
+              "type": "LPR_LOGIC",
+              "action": "CAR_SPEED_LIMIT_VIOLATION"
+              },
+              {
+                "type": "LPR_LOGIC",
+                "action": "CAR_LP_FOUND"
+              }
+]
+/////////////////////////////////////////////
 
 var options= {
     url: `http://${config.ip}:${config.restapi_port}/api/v1/events/subscriptions/`,
@@ -35,17 +27,7 @@ var options= {
     }
 };
 
-var optionspost= {
-    url: `http://${config.ip}:${config.restapi_port}/api/v1/events/subscriptions/`,
-    auth: {
-        username: config.restapi_user,
-        password: config.restapi_pass
-    }
-  };
-
-
 //GET ACTUAL SUBSCRIPTIONS
-
 request.get(options, (err, res, body) => {
   if (err) {  console.log(err); console.log('fail request get'); return }
   var json = JSON.parse(body)
@@ -66,41 +48,8 @@ request.get(options, (err, res, body) => {
   }
   createSubscription();
 });
-
-
-function createSubscription()
-{
-  console.log('Creating subscription...');
-  optionspost.json = cams;
-  request.post(optionspost, (err, res, body) => {
-    if (err) {  console.log(err); console.log('fail request post'); return }
-
-  })
-  
-  optionspost.json = sensors;
-  request.post(optionspost, (err, res, body) => {
-    if (err) {  console.log(err); console.log('fail request post'); return }
-  
-  })
-  /*
-  optionspost.json = partitions;
-  request.post(optionspost, (err, res, body) => {
-    if (err) {  console.log(err); console.log('fail request post'); return }
-
-  })
-  optionspost.json = panels;
-  request.post(optionspost, (err, res, body) => {
-    if (err) {  console.log(err); console.log('fail request post'); return }
- 
-  })*/
-
-  request.get(options, (err, res, body) => {
-    if (err) {  console.log(err); console.log('fail request get'); return }
-    var json = JSON.parse(body)
-  });
-}
-
-
+////////////////////////////////////////////////////
+//DELETE ACTUAL 
 function deleteEvents(id)
 {
   console.log("Deleting record")
@@ -115,5 +64,36 @@ function deleteEvents(id)
     if (err) { console.log(err); console.log('fail request post'); return }
     console.log(JSON.parse(body)); 
   });
+}
+//////////////////////////////////////////////
+//CREATE NEW SUBSCRIPTIONS
+//////////////////////////////////////////////
+function createSubscription()
+{
+  console.log('Creating subscription...');
+  
+  for (var p in events)
+  {
+    options.json = {
+      "callback": "http://127.0.0.1:"+config.serverPort+"/events", 
+      "filter": {
+                  "type":events[p].type,
+                  "action":events[p].action
+                }
+    }
+    console.log(options)
+
+    request.post(options, (err, res, body) => {
+      if (err) {  console.log(err); console.log('fail request post'); return }
+      console.log(body)
+  
+  })
+
+  request.get(options, (err, res, body) => {
+    if (err) {console.log(err); console.log('fail request get'); return }
+    //var json = JSON.parse(body)
+    console.log(body)
+  });
+  }
 }
 

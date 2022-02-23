@@ -58,6 +58,7 @@ app.post('/events', function (req, res) {
 				req.body[0].object_id = req.body[0].id;
 				req.body[0].state = 'Nuevo';
 				req.body[0].params = JSON.stringify(req.body[0].params);
+				req.body[0].incident = req.body[0].incident || req.body[0].action
 				delete req.body[0].id;
 				
 			

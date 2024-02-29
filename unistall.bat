@@ -1,8 +1,7 @@
 
 cd bin
 
-node unistall
-
+node uninstall.js
 
 @echo off
 

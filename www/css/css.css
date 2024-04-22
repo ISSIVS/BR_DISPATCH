@@ -137,11 +137,12 @@ body {
   background: #1F2840;
 }
 
-
-
-
 .close {
   color: #fff;
+}
+
+.closebtn:hover {
+  cursor: pointer;
 }
 
 .btn-group {
@@ -486,5 +487,6 @@ th {
 }
 
 .icono-boton:hover {
-  color: rgb(10, 10, 10); /* color al pasar el mouse por encima */
+  background-color: #aaa; /* color al pasar el mouse por encima */
+  color:#fff;
 }

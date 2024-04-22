@@ -2,8 +2,8 @@ var Service = require('node-windows').Service;
 
 // Create a new service object
 var svc = new Service({
-     name:'SecurOS Dispatch Module 10.x',
-     description: 'SecurOS Plugin to Dispatch Module, ',
+     name:'SecurOS GEA Module',
+     description: 'Module to Manage SecurOS Events, ',
      script: 'index.js'
 });
 

@@ -1,4 +1,4 @@
-// SecurOS 10.8  EventViewer HTML5 //
+// SecurOS 10.8 EventViewer HTML5 //
 
 //Securos  Information
 var Securos_Server_IP = "localhost";//"10.62.112.20";

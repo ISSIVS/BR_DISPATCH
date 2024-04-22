@@ -4,16 +4,29 @@
 
         <script src="socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link href="/css/datepicker.css" rel="stylesheet" type="text/css" />
+        <link href="css/datepicker.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
         <link rel="stylesheet" href="bower_components/bootstrap-daterangepicker/daterangepicker.css" />
         <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css" />
         <link rel="stylesheet" href="css/cssadittional.css" />
-        <link rel="stylesheet" href="/css/bootstrap-select.css" />
+        <link rel="stylesheet" href="css/bootstrap-select.css" />
         <link rel="stylesheet" href="css/css.css" />
         <link rel="stylesheet" href="css/messages.css" />
-        <link rel="icon" href="images/logos securOS__S.png" type="image/x-icon">
-        <title>SecurOS - Simplified Dispatcher Module</title>
+        <script type="text/javascript" src="js/ajax_libs_jszip_3.1.3_jszip.min.js"></script>
+        <script type="text/javascript" src="js/ajax_libs_pdfmake_0.1.53_pdfmake.min.js"></script>
+        <script type="text/javascript" src="js/ajax_libs_pdfmake_0.1.53_vfs_fonts.js"></script>
+        <link rel="icon" href="images/logos securOS__S.png" type="image/x-icon" />
+        <title>SecurOS - GEA</title>
+        <style>
+            .table td {
+                padding: 5px;
+                text-align: center;
+                border: 1px rgb(11, 8, 43) solid;
+            }
+            .table th {
+                padding: 0.75rem;
+            }
+        </style>
     </head>
 
     <body>
@@ -40,16 +53,6 @@
                             ><i class="fa fa-list-ul" aria-hidden="true"></i> Incidentes <span class="sr-only">(current)</span></a
                         >
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="directory()"
-                            ><i class="fa fa-address-book" aria-hidden="true"></i> Lista de Contatos</a
-                        >
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link hidden" href="#" onclick="report()"
-                            ><i class="fa fa-download" aria-hidden="true"></i> Relatórios</a
-                        >
-                    </li>
                 </ul>
                 <span class="navbar-text activeIncidents" id="activeIncidents"></span>
                 <span class="navbar-text user" style="color: rgba(255, 255, 255, 0.5)" id="test"> Usuário Externo</span>
@@ -66,18 +69,18 @@
             <!-- Filter by name -->
             <div class="col-md-3 filters" id="filters">
                 <input
+                    class="form-control"
                     type="text"
                     style="width: 100%"
                     id="filterbyname"
                     onkeyup="filterByName()"
-                    placeholder="Filtrar por nome ou ID..."
-                    title="Type in a name"
+                    placeholder="Filtrar por nome, ID ou evento..."
                 />
             </div>
             <!-- Filter by Priority -->
-            <div class="col-md-3 filters" id="filters">
+            <div hidden="true" class="col-md-3 filters" id="filters">
                 <select
-                    class="selectpicker select"
+                    class="form-control selectpicker select"
                     multiple
                     data-live-search="true"
                     onchange="filterByIncident(this)"
@@ -111,7 +114,15 @@
             </div>
             <!-- Filter by Date-Time -->
             <div class="col-md-3 filters" id="filters" id="tablediv">
-                <input type="text" class="form-control" id="datetimepicker" placeholder="Selecione um intervalo de tempo" />
+                <input
+                    type="text"
+                    class="form-control"
+                    style="width: 100%"
+                    id="datetimepicker"
+                    tabindex="-1"
+                    aria-hidden="true"
+                    placeholder="Selecione um intervalo de tempo"
+                />
             </div>
 
             <!-- main table -->
@@ -127,26 +138,28 @@
                                     onclick="seleccionarTodos()"
                                 ></i>
                             </th>
-                            <th data-field="priority" width="50px"><i class="fa fa-info-circle fa_header" aria-hidden="true"></i></th>
+                            <th hidden="true" data-field="priority" width="50px" class="to_hide">
+                                <i class="fa fa-info-circle fa_header" aria-hidden="true"></i>
+                            </th>
                             <th data-field="object" class="to_hide" width="70px">Objeto</th>
-                            <th data-field="id_obj" width="20px">ID</th>
+                            <th data-field="id_obj" width="100px">ID</th>
                             <th data-field="name" width="20%">Nome</th>
                             <th data-field="event" width="20%">Evento</th>
                             <th data-field="time" width="210px">
-                                <span style="opacity: 0">Data-Hora</span>
+                                <span style="opacity: 0; position: absolute">Data-Hora</span>
                                 <i class="fa fa-clock fa_header" aria-hidden="true"></i>
                             </th>
                             <th data-field="state" class="to_hide" width="125em">Estado</th>
                             <th data-field="operator" class="to_hide" width="100em">
-                                <span style="opacity: 0">Operador</span>
+                                <span style="opacity: 0; position: absolute">Operador</span>
                                 <i class="fa fa-user fa_header" aria-hidden="true"></i>
                             </th>
-                            <th data-field="response_time" class="to_hide">
-                                <span style="opacity: 0">Hora de Resposta</span>
+                            <th data-field="response_time" class="to_hide" width="100px">
+                                <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resposta</span>
                                 <i id="check1" class="fa-solid fa-check fa_header icono-boton" onclick="check1()"></i>
                             </th>
-                            <th data-field="resolution_time" class="to_hide">
-                                <span style="opacity: 0">Hora de Resolução</span>
+                            <th data-field="resolution_time" class="to_hide" width="100px">
+                                <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resolução</span>
                                 <i id="check2" class="fa-solid fa_header fa-check-double icono-boton" onclick="check2()"></i>
                             </th>
                             <th hidden="true" data-field="action" class="to_hide">Comentário</th>
@@ -189,6 +202,9 @@
                                 <button class="btn btn-primary" onclick="live()" type="button">
                                     <i class="fa fa-video-camera" aria-hidden="true"></i>
                                 </button>
+                                <button hidden="false" id="face_x_btn" class="btn btn-warning" onclick="facex()" type="button">
+                                    <i class="fa fa-person" aria-hidden="true"></i>
+                                </button>
                                 <button
                                     class="btn btn-info dropdown-toggle"
                                     type="button"
@@ -198,17 +214,12 @@
                                 >
                                     Ações
                                     <ul class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Transferir</a>
-                                        <!--<a class="dropdown-item" href="#">Exportar Evidencia</a> -->
-                                        <!-- Submenu Priority -->
-
                                         <!-- Submenu State -->
-                                        <div class="dropdown-divider"></div>
                                         <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown">Mudar Estado</a>
                                         <div class="dropdown-submenu">
                                             <a class="dropdown-item" href="#">Em Progresso</a>
                                             <a class="dropdown-item" href="#">Resolvido</a>
-                                            <!--<a class="dropdown-item"href="#">Cerrado</a>-->
+                                            <!-- <a class="dropdown-item"href="#">Cerrado</a> -->
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="#">Alarme Falso</a>
                                         </div>
@@ -258,350 +269,18 @@
                     </div>
                     <!-- INCIDENTS BUTTONS -->
                 </div>
-                <!-- TRANSFER CARD -->
 
                 <div class="card hidden" id="transferCard">
                     <div class="row">
-                        <!-- Title-->
-                        <div class="col card-title">
-                            <h5>Transferir <span id="card_title"></span></h5>
-                        </div>
-                        <!-- Close Button-->
                         <div class="col">
-                            <button type="button" class="close" aria-label="Close">
-                                <span aria-hidden="true" class="closeCardTransfer">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Transfer To Lable-->
-                    <div class="row transfer-item">
-                        <div class="col-md-6"><span class="align-top incident-head">Para:</span></div>
-                    </div>
-                    <!-- Transfer To Selection Dropdown-->
-                    <div class="row incident-item">
-                        <div class="col-md-12">
-                            <select id="to" name="to" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref" placeholder="to">
-                                <option selected value="">Selecionar</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Transfer Button -->
-                    <div class="row incident-item">
-                        <div class="col-md-12">
-                            <button type="submit" onclick="send_transfer()" class="btn btn-success">Enviar</button>
                         </div>
                     </div>
                 </div>
-                <!--  end transferCard-->
-
-                <!-- Export CARD -->
-
-                <div class="card hidden" id="exportCard">
-                    <div class="row">
-                        <!-- Title-->
-                        <div class="col card-title">
-                            <h5>Exportar Evidência <span id="card_title"></span></h5>
-                        </div>
-                        <!-- Close Button-->
-                        <div class="col">
-                            <button type="button" class="close" aria-label="Close">
-                                <span aria-hidden="true" class="closeCardExport">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Export time Lable-->
-                    <div class="row transfer-item">
-                        <div class="col-md-12"><span class="align-top incident-head">Opções para Exportar:</span></div>
-                    </div>
-                    <!-- Export Radio select time-->
-                    <div class="row transfer-item">
-                        <div class="col-md-12">
-                            <form>
-                                <div class="form-group">
-                                    <div id="time_transfer" class="radio">
-                                        <label><input type="radio" value="30" name="optradio" id="t1" checked /> 30s</label>
-                                        <label><input type="radio" value="60" id="t2" name="optradio" /> 60s</label>
-                                        <label><input type="radio" id="t3" value="120" name="optradio" /> 120s</label>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- Export Button -->
-                    <div class="row incident-item">
-                        <div class="col-md-12">
-                            <button type="submit" onclick="export_evidence()" class="btn btn-success">Exportar</button>
-                        </div>
-                    </div>
-                </div>
-                <!--  end ExportCard-->
-
-                <div class="card hidden" id="contactCard">
-                    <div class="row">
-                        <!-- Title-->
-                        <div class="col card-title">
-                            <h5>Contatos <span id="card_title"></span></h5>
-                        </div>
-                    </div>
-                    <!-- Transfer To Lable-->
-                    <div class="row transfer-item">
-                        <table class="table table-striped table-sm table-dark">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Cargo</th>
-                                    <th scope="col">Telefone</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contactTable">
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>Alejandro Garcia</td>
-                                    <td>ISS</td>
-                                    <td>3005555555</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">2</th>
-                                    <td>Nelson Camargo</td>
-                                    <td>Infotec</td>
-                                    <td>3005555555</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">3</th>
-                                    <td>Jorge Salamanca</td>
-                                    <td>Infotec</td>
-                                    <td>3005555555</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!--  end ContactCard-->
+                <div id="contactCard"></div>
             </div>
         </div>
         <!-- END INCIDENTS TAB-->
 
-        <!-- DIRECTORY TAB -->
-        <div class="row hidden directory" id="directory">
-            <!-- Directory New User -->
-            <div class="col-md-6">
-                <h2>Lista de Contatos</h2>
-                <h5>Adicionar novo contato</h5>
-                <!-- Directory form -->
-                <form id="newuser" name="newuser">
-                    <!-- Fullname -->
-                    <div class="form-group form-group-directory">
-                        <input name="fullname" id="fullname" type="text" class="form-control" placeholder="Nome completo" />
-                    </div>
-                    <!-- Title -->
-                    <div class="form-group form-group-directory">
-                        <input name="title" id="title" type="text" class="form-control" placeholder="Cargo" />
-                    </div>
-                    <!-- E-mail -->
-                    <div class="form-group form-group-directory">
-                        <input
-                            name="direccion"
-                            type="text"
-                            class="form-control"
-                            id="email"
-                            placeholder="E-mail"
-                            aria-describedby="emailHelp"
-                        />
-                    </div>
-                    <!-- Phone -->
-                    <div class="form-group form-group-directory">
-                        <input name="phone" type="tel" id="phone" name="phone" class="form-control" placeholder="Telefone" />
-                    </div>
-                    <!-- Panel -->
-                    <div class="form-group">
-                        <input name="panel" type="text" id="panel" class="form-control" placeholder="Associado" />
-                    </div>
-                    <!-- Button Submit -->
-
-                    <button class="btn btn-success search-btn btn-directory" onclick="btnDir(event)">
-                        <i class="fa fa-plus-square" aria-hidden="true"></i>
-                    </button>
-                </form>
-            </div>
-            <!-- End Directory New User -->
-
-            <!-- Directory table -->
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-7"></div>
-                    <div class="col-md-5 filters" id="filters">
-                        <input
-                            type="text"
-                            style="width: 100%"
-                            id="filterByAbonado"
-                            onkeyup="filterByAbonado()"
-                            placeholder="Filtrar..."
-                            title="Type an acound"
-                        />
-                    </div>
-                </div>
-                <table id="nametable" class="table table-names table-hover tablediv table-condensed table-dark table-responsive-md">
-                    <thead>
-                        <tr class="clickable-row">
-                            <th hidden="true" data-field="id">ID</th>
-                            <th data-field="fullname">Nome</th>
-                            <th data-field="email">E-mail</th>
-                            <th data-field="phone">Telefone</th>
-                            <th data-field="title">Cargo</th>
-                            <th data-field="panel">Associado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rowsnames"></tbody>
-                </table>
-                <button type="submit" onclick="deleteUser()" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            <!--End Directory table -->
-        </div>
-        <!-- END DIRECTORY TAB -->
-
-        <!-- REPORTS TAB -->
-        <div class="row hidden directory" id="reports">
-            <div class="col-md-12" id="formreports">
-                <div class="box-header">
-                    <h2>Relatórios</h2>
-                </div>
-                <form class="consolidado" id="formulario">
-                    <div class="box box-primary">
-                        <div class="box-body">
-                            <!--------------- Date ----------------->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="box-label">Intervalo</label>
-                                    <div class="input-group">
-                                        <div class="input-group-addon">
-                                            <i class="fa fa-clock-o"></i>
-                                        </div>
-                                        <input type="text" class="form-control pull-right" id="reservationtime" />
-                                    </div>
-                                    <!-- /.input group -->
-                                </div>
-                                <!-- /.form-group -->
-                            </div>
-                            <!-- /.col-md -->
-                            <!---------------Inicidents----------------->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="box-label">Tipo de Incidente</label>
-                                    <select
-                                        class="form-control select2 select2-hidden-accessible"
-                                        style="width: 100%"
-                                        data-select2-id="1"
-                                        tabindex="-1"
-                                        aria-hidden="true"
-                                        id="incidents-list"
-                                    >
-                                        <option selected="selected" value="All">All</option>
-                                        <option value="MD_START">Detecção de movimento iniciou</option>
-                                        <option value="MD_STOP">Detecção de movimento parou</option>
-                                        <option value="ARMED">Câmera armada</option>
-                                        <option value="DISARMED">Câmera desarmada</option>
-                                        <option value="ATTACH">Câmera conectada</option>
-                                        <option value="DETACH">Câmera desconectada</option>
-                                        <option value="REC">Câmera gravando</option>
-                                        <option value="REC_STOP">Câmera parou gravação</option>
-                                        <option value="REC_ERROR">Erro de gravação da câmera</option>
-                                        <option value="VCA_EVENT">Evento de analítico de vídeo</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <!---------------States ----------------->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="box-label">Estado</label>
-                                    <select
-                                        class="form-control select2 select2-hidden-accessible"
-                                        style="width: 100%"
-                                        data-select2-id="0"
-                                        tabindex="-1"
-                                        aria-hidden="true"
-                                        id="state-list"
-                                    >
-                                        <option selected="selected" value="0">Todos</option>
-                                        <option value="New">Novo</option>
-                                        <option value="In Progress">Em progresso</option>
-                                        <option value="Resolved">Resolvido</option>
-                                        <option value="Closed">Encerrado</option>
-                                    </select>
-                                </div>
-                                <!-- /.form-group -->
-                            </div>
-                            <!-- /.col-md -->
-                            <!---------------Cameras ----------------->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="box-label">Câmeras</label>
-                                    <select
-                                        class="form-control select2 select2-hidden-accessible cam_select"
-                                        id="cam_select"
-                                        multiple=""
-                                        data-placeholder="Select Cameras"
-                                        style="width: 100%"
-                                        data-select2-id="7"
-                                        tabindex="-1"
-                                        aria-hidden="true"
-                                    >
-                                        <option data-select2-id="26">Câmeras não carregadas</option>
-                                    </select>
-                                </div>
-                                <!-- /.form-group -->
-                            </div>
-                            <!-- /.col-md -->
-                            <!---------------Submit----------------->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <button type="submit" onclick="reports(event)" class="btn btn-primary search-btn">Buscar</button>
-                                </div>
-                            </div>
-                            <!-- /.col-md -->
-                        </div>
-                        <!-- /.box-body -->
-                    </div>
-                    <!-- /.box box-primary -->
-                </form>
-            </div>
-            <!--  end ./col-md Div Reports -->
-
-            <div class="col-md-12 hidden overlay" id="overlaydiv">
-                <section>
-                    <div id="overlay">
-                        <i class="fa fa-spinner fa-spin spin-big"></i>
-                    </div>
-                </section>
-            </div>
-
-            <div class="col-md-12" id="tablereports">
-                <div class="box-header">
-                    <h3 class="box-title" id="resultsTitle">
-                        <i class="fa fa-backward" id="backReport" aria-hidden="true"></i> Relatórios
-                    </h3>
-                </div>
-                <table id="table" class="table table-reports table-hover tablediv table-condensed table-dark table-responsive-md">
-                    <thead>
-                        <tr class="clickable-row">
-                            <th hidden="true" data-field="id">ID</th>
-                            <th data-field="name">Tipo de Objeto</th>
-                            <th data-field="name">Nome</th>
-                            <th data-field="name">Incidente</th>
-                            <th data-field="time">Tempo do Incidente</th>
-                            <th data-field="state">Estado</th>
-                            <th data-field="operator">Operador</th>
-                            <th data-field="response_time">Tempo de Resposta</th>
-                            <th data-field="resolution_time">Tempo de Resolução</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rowsResults"></tbody>
-                </table>
-            </div>
-        </div>
-        <!--  end ./row Div Reports -->
-        <!-- END REPORTS TAB -->
         <div id="progress">
             <span class="progress-text"></span>
             <div class="progress-bar"></div>
@@ -609,10 +288,10 @@
         <!-- HTML END-->
     </body>
     <!-- Scripts-->
-    <script src="/js/jquery.min.js"></script>
+    <script src="js/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="/js/bootstrap-datepicker.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
     <!-- bootstrap datepicker -->
@@ -636,13 +315,11 @@
     <script src="bower_components/fastclick/lib/fastclick.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
-    <script src="/js/bootstrap-select.min.js"></script>
+    <script src="js/bootstrap-select.min.js"></script>
     <script src="js/alertMessage.js"></script>
     <script src="js/main.js"></script>
     <script src="js/datepicker.js"></script>
     <script src="js/comments.js"></script>
     <script src="js/font6js/all.min.js"></script>
     <script src="js/tableHTMLExport.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
 </html>

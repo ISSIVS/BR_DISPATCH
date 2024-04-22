@@ -1,27 +1,8 @@
-CREATE DATABASE  dispatch
+CREATE DATABASE dispatch
   WITH OWNER = postgres
        ENCODING = 'UTF8'
        TABLESPACE = pg_default
        CONNECTION LIMIT = -1;
-
--- Table: directory
-
--- DROP TABLE directory;
-
-CREATE TABLE directory
-(
-  person_name text,
-  email_address text,
-  phone_number text,
-  title text,
-  panel text,
-  id bigserial NOT NULL
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE directory
-  OWNER TO postgres;
 
 -- Table: events
 

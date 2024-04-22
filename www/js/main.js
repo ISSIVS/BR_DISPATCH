@@ -16,11 +16,13 @@ var startDateFilter, endDateFilter;
 
 var socket = io();
 socket.on("newEvent", function (msg) {
+    if (msg.length == 0) return;
+
     console.log("receiving new event :", msg);
     addToTable(msg);
 });
 socket.on("Events", function (msg) {
-    //console.log('receiving event :', msg)
+    console.log("receiving event :", msg);
     buildTable(msg);
 });
 socket.on("directory", function (msg) {
@@ -38,126 +40,23 @@ socket.on("queryResult", function (msg) {
     buildReport(msg, function (msg) {});
 });
 
-$(document).ready(function () {
-    $("#datetimepicker").daterangepicker({
-        timePicker: true,
-        timePicker24Hour: true,
-        locale: {
-            format: "DD/MM/YYYY HH:mm:ss",
-        },
-    });
-
-    $("#datetimepicker").on("apply.daterangepicker", function (ev, picker) {
-        filterByDateTime(picker.startDate, picker.endDate);
-    });
-});
+document.addEventListener(
+    "focus",
+    function (event) {
+        const target = event.target;
+        if (target.tagName.toLowerCase() === "input") {
+            event.stopPropagation();
+        }
+    },
+    true
+);
 
 function incidents() {
     $(".nav-item").click(function (e) {
         //console.log(this);
         $(this).addClass("active").siblings().removeClass("active");
     });
-    var dir = document.getElementById("reports");
-    dir.classList.add("hidden");
-    var dir = document.getElementById("directory");
-    dir.classList.add("hidden");
-    //console.log('hidden directory')
     var inc = document.getElementById("incidents");
-    inc.classList.remove("hidden");
-}
-
-function directory() {
-    $(".nav-item").click(function (e) {
-        $(this).addClass("active").siblings().removeClass("active");
-    });
-
-    var dir = document.getElementById("directory");
-    dir.classList.remove("hidden");
-    //console.log('Showing Directory', dir)
-    var inc = document.getElementById("incidents");
-    inc.classList.add("hidden");
-    var dir = document.getElementById("reports");
-    dir.classList.add("hidden");
-    socket.emit("getDirectory", null);
-}
-
-function report() {
-    $(".nav-item").click(function (e) {
-        //console.log(this);
-        $(this).addClass("active").siblings().removeClass("active");
-    });
-    var dir = document.getElementById("reports");
-    dir.classList.remove("hidden");
-    var inc = document.getElementById("incidents");
-    inc.classList.add("hidden");
-    var inc = document.getElementById("directory");
-    inc.classList.add("hidden");
-}
-
-function buildCameras(msg) {
-    var json = JSON.parse(msg);
-    cameras = json;
-    var cam_select = document.getElementById("cam_select");
-    var len = json.data.length;
-    //console.log(len);
-    for (var i = 0; i < len; i++) {
-        cam_select.options[i] = new Option(json.data[i].name, json.data[i].id);
-        coordinates[i] = json.data[i].settings.coordinates;
-        console.log(json.data[i].settings.coordinates);
-    }
-}
-
-function buildNames(json) {
-    var table = "";
-    var options = '<option selected value="">Select</option>';
-    for (var i = 0; i < json.length; i++) {
-        table += '<tr class="table-row-names clickable-row " >';
-        table += '<th hidden="true" scope="row" id="id">' + json[i].id + "</th>";
-        table += '<td id="Fullname" min-width="100px" >' + json[i].person_name + "</td>";
-        table += '<td id="email" width="200px" >' + json[i].email_address + "</td>";
-        table += '<td id="phone" >' + json[i].phone_number + "</td>";
-        table += '<td id="title">' + json[i].title + "</td>";
-        table += '<td id="title">' + json[i].panel + "</td>";
-        table += "</tr>";
-
-        options += `<option value="${json[i].email_address}">${json[i].title} ${json[i].person_name} (${json[i].email_address})</option>`;
-    }
-    try {
-        const regex = /null/gi;
-        table = table.replace(regex, "");
-        options = options.replace(regex, "");
-
-        var rows = document.getElementById("rowsnames");
-        rows.innerHTML = table;
-
-        var rows = document.getElementById("to");
-        rows.innerHTML = options;
-
-        rows.classList.add("tbody");
-    } catch (e) {
-        document.getElementById("test").innerHTML = "Error 123:" + e;
-    }
-
-    $(document).ready(function ($) {
-        $(".table-row-names").click(function (e) {
-            //console.log(this);
-            $(this).addClass("table-selected").siblings().removeClass("table-selected");
-            //$('.table-selected td').addClass("table-selected")
-            var id = $(this)
-                .find("th#" + "id")
-                .html();
-            var fullnameSelected = $(this);
-            //console.log(id)
-            name_selected = id;
-            contact_selected = fullnameSelected;
-        });
-    });
-}
-
-function btnBackReport(event) {
-    var dir = document.getElementById("tablereports");
-    dir.classList.add("hidden");
-    var inc = document.getElementById("formreports");
     inc.classList.remove("hidden");
 }
 
@@ -172,10 +71,10 @@ async function thread(json, callback) {
         table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options) + "</td>";
         table += '<td id="state">' + json[i].state || "" + "</td>";
         table += '<td id="operator">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td id="responsetime"></td>';
-        else table += '<td id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
-        if (json[i].resolution_time == null) table += '<td id="resolution_time"></td>';
-        else table += '<td id="resolution_time">' + new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) + "</td>";
+        if (json[i].response_time == null) table += '<td width="100px" id="responsetime"></td>';
+        else table += '<td width="100px" id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
+        if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"></td>';
+        else table += '<td width="100px" id="resolution_time">' + new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) + "</td>";
         table += '<td hidden="true" id="comment">' + json[i].comment + "</td>";
         table += '<td hidden="true" id="action">' + json[i].action + "</td>";
         table += '<td hidden="true" id="priority">' + json[i].priority + "</td>";
@@ -186,35 +85,6 @@ async function thread(json, callback) {
     callback(table);
 }
 
-function buildReport(json, callback) {
-    var title = document.getElementById("resultsTitle");
-    title.innerHTML =
-        '<h3><button class="btn btn-success search-btn btn-directory backReport" onclick="btnBackReport(event)">' +
-        '<i class="fa fa-backward" id="backReport" aria-hidden="true"></i></button>' +
-        " " +
-        json.length +
-        " Results</h3>";
-
-    thread(json, function (table) {
-        try {
-            const regex = /null/gi;
-            table = table.replace(regex, "");
-
-            var rows = document.getElementById("rowsResults");
-            rows.innerHTML = table;
-            rows.classList.add("tbody");
-
-            var dir = document.getElementById("tablereports");
-            dir.classList.remove("hidden");
-            var inc = document.getElementById("overlaydiv");
-            inc.classList.add("hidden");
-        } catch (e) {
-            document.getElementById("test").innerHTML = "Error 221: " + e;
-        }
-
-        callback("ok");
-    });
-}
 var tabindex = undefined;
 
 function btnProcedure(event) {
@@ -303,12 +173,7 @@ function addToTable(json) {
                         break;
                 }
                 json[i].camera_id = params.cam_id;
-                json[i].name =
-                    `<img src="http://localhost:21093${params.detection._links.detection_image}" alt="User Img" class="user_img">` +
-                    " " +
-                    params.person.first_name +
-                    " " +
-                    params.person.last_name;
+                json[i].name = params.person.first_name + " " + params.person.last_name;
                 json[i].comment = params.person.notes;
                 json[i].incident = "Face reconhecida";
 
@@ -317,40 +182,56 @@ function addToTable(json) {
             if (json[i].type == "CAM") {
                 json[i].camera_id = json[i].object_id;
             }
-            if (json[i].priority == "Alta")
-                table += '<td id="priority" width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
-            else if (json[i].priority == "Média")
-                table += '<td id="priority" width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
-            else table += '<td id="priority" width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
-            if (json[i].type == "GENERIC_USER") table += '<td id="type" width="50px" >' + "USER" + "</td>";
-            else table += '<td id="type" width="50px" >' + json[i].type + "</td>";
 
-            if (json[i].action == "DETECTION") json[i].incident = "Face detectada";
-            if (json[i].priority == "undefined") json[i].priority = "";
+            if (json[i].type == "FACE_X_SERVER") {
+                json[i].type = "FACE_X";
+            }
 
-            table += '<td id="object_id" width="100px"  class="to_hide">' + json[i].object_id + "</td>";
+            if (json[i].action == "VCA_EVENT") {
+                json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+            }
+
+            if (json[i].priority == "undefined") {
+                json[i].priority = "";
+                table += '<td id="priority" hidden="true" class="to_hide"  width="50px" value=""></td>';
+            } else {
+                if (json[i].priority == "Alta")
+                    table +=
+                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
+                else if (json[i].priority == "Média")
+                    table +=
+                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
+                else
+                    table +=
+                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
+            }
+            if (json[i].type == "GENERIC_USER") table += '<td id="type" width="70px" >' + "USER" + "</td>";
+            else table += '<td id="type" width="70px" >' + json[i].type + "</td>";
+
+            table += '<td id="object_id" width="100px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
             table += '<td id="name" width="20%">' + json[i].name + "</td>";
             table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
             table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
             table += '<td id="state"  width="125em"  class="to_hide">' + json[i].state || "" + "</td>";
             table += '<td id="operator"  width="100em" class="to_hide">' + json[i].operator + "</td>";
-            if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
+            if (json[i].response_time == null) table += '<td width="100px" id="responsetime"  class="to_hide"></td>';
             else
                 table +=
-                    '<td id="responsetime"  class="to_hide">' +
+                    '<td width="100px" id="responsetime"  class="to_hide">' +
                     new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) +
                     "</td>";
-            if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
+            if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"  class="to_hide"></td>';
             else
                 table +=
-                    '<td id="resolution_time"  class="to_hide">' +
+                    '<td width="100px" id="resolution_time"  class="to_hide">' +
                     new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
                     "</td>";
             table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
             table += '<td hidden="true" id="action"  class="to_hide">' + json[i].action + "</td>";
             table += '<td hidden="true" id="priority"  class="to_hide">' + json[i].priority + "</td>";
             table += '<td hidden="true" id="procedure"  class="to_hide">' + json[i].procedure + "</td>";
-            table += '<td hidden="true"id="id_cam"  class="to_hide"ss>' + json[i].camera_id + "</td>";
+            table += '<td hidden="true"id="id_cam"  class="to_hide">' + json[i].camera_id + "</td>";
+            table += '<td hidden="true"id="params"  class="to_hide">' + json[i].params + "</td>";
             table += "</tr>";
 
             try {
@@ -372,13 +253,14 @@ function addToTable(json) {
 function buildTable(json) {
     //var cam_select = document.getElementById("cam_select");
     var table = "";
+
     for (var i = 0; i < json.length; i++) {
         table += '<tr class="table-row clickable-row" tabindex="' + json[i].id + '" onkeydown=keydown()">';
         table += '<td scope="row" id="id" hidden = "true">' + json[i].id + "</th>";
         table +=
             '<td id="tdcheck_' +
             json[i].id +
-            '" width="50px"><input type="checkbox" id="check_' +
+            '" width="50px" ><input type="checkbox" id="check_' +
             json[i].id +
             '" name="' +
             json[i].object_id +
@@ -400,12 +282,7 @@ function buildTable(json) {
                     break;
             }
             json[i].camera_id = params.cam_id;
-            json[i].name =
-                `<img src="http://localhost:21093${params.detection._links.detection_image}" alt="User Img" class="user_img">` +
-                " " +
-                params.person.first_name +
-                " " +
-                params.person.last_name;
+            json[i].name = params.person.first_name + " " + params.person.last_name;
             json[i].comment = params.person.notes;
             json[i].incident = "Face reconhecida";
 
@@ -414,31 +291,46 @@ function buildTable(json) {
         if (json[i].type == "CAM") {
             json[i].camera_id = json[i].object_id;
         }
-        if (json[i].priority == "Alta")
-            table += '<td id="priority" width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
-        else if (json[i].priority == "Média")
-            table += '<td id="priority" width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
-        else table += '<td id="priority" width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
-        if (json[i].type == "GENERIC_USER") table += '<td id="type" width="50px" >' + "USER" + "</td>";
-        else table += '<td id="type" width="50px" >' + json[i].type + "</td>";
 
-        if (json[i].action == "DETECTION") json[i].incident = "Face detectada";
-        if (json[i].priority == "undefined") json[i].priority = "";
+        if (json[i].type == "FACE_X_SERVER") {
+            json[i].type = "FACE_X";
+        }
 
-        table += '<td id="object_id" width="100px"  class="to_hide">' + json[i].object_id + "</td>";
+        if (json[i].action == "VCA_EVENT") {
+            json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+        }
+
+        if (json[i].priority == "undefined") {
+            json[i].priority = "";
+            table += '<td id="priority" hidden="true" class="to_hide"  width="50px" value=""></td>';
+        } else {
+            if (json[i].priority == "Alta")
+                table +=
+                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
+            else if (json[i].priority == "Média")
+                table +=
+                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
+            else
+                table +=
+                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
+        }
+        if (json[i].type == "GENERIC_USER") table += '<td id="type" width="70px" >' + "USER" + "</td>";
+        else table += '<td id="type" width="70px" >' + json[i].type + "</td>";
+
+        table += '<td id="object_id" width="100px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
         table += '<td id="name" width="20%">' + json[i].name + "</td>";
         table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
         table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
         table += '<td id="state"  width="125em"  class="to_hide">' + json[i].state || "" + "</td>";
         table += '<td id="operator"  width="100em" class="to_hide">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
+        if (json[i].response_time == null) table += '<td width="100px" id="responsetime"  class="to_hide"></td>';
         else
             table +=
-                '<td id="responsetime"  class="to_hide">' + new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) + "</td>";
-        if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
+                '<td width="100px" id="responsetime"  class="to_hide">' + new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) + "</td>";
+        if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"  class="to_hide"></td>';
         else
             table +=
-                '<td id="resolution_time"  class="to_hide">' +
+                '<td width="100px" id="resolution_time"  class="to_hide">' +
                 new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
                 "</td>";
         table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
@@ -446,6 +338,7 @@ function buildTable(json) {
         table += '<td hidden="true" id="priority"  class="to_hide">' + json[i].priority + "</td>";
         table += '<td hidden="true" id="procedure"  class="to_hide">' + json[i].procedure + "</td>";
         table += '<td hidden="true"id="id_cam"  class="to_hide"ss>' + json[i].camera_id + "</td>";
+        table += '<td hidden="true"id="params"  class="to_hide"ss>' + json[i].params + "</td>";
         table += "</tr>";
     }
     try {
@@ -482,7 +375,8 @@ function ready($) {
         $(document).on("dblclick", ".table-row", function () {
             try {
                 var cam_id = document.getElementById("card_id").innerHTML;
-                console.log("On Click Incidents Rows to show cam_id", cam_id);
+                var params = document.getElementById("params").innerHTML;
+                console.log("On Click Incidents Rows to show cam_id", cam_id, params);
                 var date = document.getElementById("card_incidentDate").innerHTML;
                 ISScustomAPI.sendReact("MEDIA_CLIENT", Média_client, "ADD_SEQUENCE", '{"mode":"1x1","seq":"' + cam_id + '"}');
             } catch (e) {
@@ -557,58 +451,12 @@ function ready($) {
     });
 }
 
-socket.on("abonado", function (contacts) {
-    console.log("socket.on(abonado) main.js contacts", contacts);
-    var item = document.getElementById("contactCard");
-    if (contacts) {
-        if (item.classList.contains("hidden")) {
-            item.classList.remove("hidden");
-        }
-        var table = document.getElementById("contactTable");
-        var rows = "";
-        var i = 1;
-        contacts.forEach((element) => {
-            rows += `<tr>
-                        <th scope="row">${i}</th>
-                        <td>${element.person_name}</td>
-                        <td>${element.title}</td>
-                        <td>${element.phone_number}</td>
-                    </tr>`;
-            i++;
-        });
-        table.innerHTML = rows;
-    }
-});
-
-//Function Add new User to DB
-function btnDir(e) {
-    e.preventDefault();
-    var form = document.getElementById("newuser");
-    var user = new FormData(form);
-    var newuser = {};
-    newuser.person_name = form.fullname.value;
-    newuser.email_address = form.email.value;
-    newuser.phone_number = form.phone.value;
-    newuser.title = form.title.value;
-    newuser.panel = form.panel.value;
-    form.fullname.value = "";
-    form.email.value = "";
-    form.phone.value = "";
-    form.title.value = "";
-    form.panel.value = "";
-    if (newuser.person_name == "" || newuser.email_address == "") {
-        //verification
-    } else {
-        socket.emit("newuser", newuser);
-    }
-}
-
 //-------------------------- JQUERYS Section -----------------
 
 //Activate Multiple Select filter for Incidents Type
 $(".select").selectpicker({ noneSelectedText: "Tipo de prioridade", width: "100%" });
 
-//Close Inicidents TAB  deselect rows and goto top table
+//Close Incidents TAB  deselect rows and goto top table
 $(".closeCard").click(function (e) {
     var rows = document.getElementById("incidentCard");
     var table = document.getElementById("tablediv");
@@ -620,30 +468,6 @@ $(".closeCard").click(function (e) {
         $(".table-row").first().focus();
 
         console.log("Close");
-    }
-});
-
-//Close Transfer Tab
-$(".closeCardTransfer").click(function (e) {
-    var rows = document.getElementById("transferCard");
-    var incidents = document.getElementById("incidentCards");
-    if (!rows.classList.contains("hidden")) {
-        rows.classList.add("hidden");
-    }
-    if (incidents.classList.contains("hidden")) {
-        incidents.classList.remove("hidden");
-    }
-});
-
-//Close Export Tab
-$(".closeCardExport").click(function (e) {
-    var rows = document.getElementById("exportCard");
-    var incidents = document.getElementById("incidentCards");
-    if (!rows.classList.contains("hidden")) {
-        rows.classList.add("hidden");
-    }
-    if (incidents.classList.contains("hidden")) {
-        incidents.classList.remove("hidden");
     }
 });
 
@@ -699,6 +523,7 @@ $(".dropdown-item").click(function (e) {
             break;
     }
 });
+
 //Start Datetimepicker for reports
 $(function () {
     $("#datepicker")
@@ -707,6 +532,21 @@ $(function () {
             todayHighlight: true,
         })
         .datepicker("update", new Date());
+});
+
+//Format timePicker and filter table by date-time
+$(document).ready(function () {
+    $("#datetimepicker").daterangepicker({
+        timePicker: true,
+        timePicker24Hour: true,
+        locale: {
+            format: "DD/MM/YYYY HH:mm:ss",
+        },
+    });
+
+    $("#datetimepicker").on("apply.daterangepicker", function (ev, picker) {
+        filterByDateTime(picker.startDate, picker.endDate);
+    });
 });
 
 //-------------------------- JQUERYS  END  -----------------
@@ -732,14 +572,21 @@ $("#pdf").on("click", () => {
     var docDefinition = {
         pageOrientation: "landscape",
         content: [
-            { text: "Relatório ", style: "header" },
+            { text: "Relatório - GEA", style: "header", alignment: "center" },
             { text: "\n" },
+            { text: new Date().toLocaleString(), style: "subheader", alignment: "center" },
+            { text: "\n\n" },
             {
                 table: {
                     body: tableData,
+                    widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", 50, "auto", "auto"],
                 },
             },
         ],
+        defaultStyle: {
+            fontSize: 8,
+            alignment: "center",
+        },
         styles: {
             header: {
                 fontSize: 18,
@@ -749,9 +596,7 @@ $("#pdf").on("click", () => {
     };
 
     var pdfDoc = pdfMake.createPdf(docDefinition);
-    pdfDoc.download(
-        "RelatórioPDF_" + new Date().toLocaleString("pt-BR").replace(", ", "-").trim().replace(/[:]/g, "").replace(/[\/]/g, ".") + ".pdf"
-    );
+    pdfDoc.download("RelatórioPDF_" + formattedDateTime(new Date()) + ".pdf");
 });
 
 //Export to CSV
@@ -773,12 +618,7 @@ $("#csv").on("click", () => {
     if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute(
-            "download",
-            "RelatórioCSV_" +
-                new Date().toLocaleString("pt-BR").replace(", ", "-").trim().replace(/[:]/g, "").replace(/[\/]/g, ".") +
-                ".csv"
-        );
+        link.setAttribute("download", "RelatórioCSV_" + formattedDateTime(new Date()) + ".csv");
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
@@ -786,64 +626,6 @@ $("#csv").on("click", () => {
     }
 });
 
-//Transfer click
-function transfer() {
-    console.log("Transfer");
-    var incidents = document.getElementById("incidentCards");
-    var transfer = document.getElementById("transferCard");
-    if (transfer.classList.contains("hidden")) {
-        transfer.classList.remove("hidden");
-    }
-    if (!incidents.classList.contains("hidden")) {
-        incidents.classList.add("hidden");
-    }
-}
-//Export Evidence click
-function exportEvidence() {
-    var incidents = document.getElementById("incidentCards");
-    var exportCard = document.getElementById("exportCard");
-    if (exportCard.classList.contains("hidden")) {
-        exportCard.classList.remove("hidden");
-    }
-    if (!incidents.classList.contains("hidden")) {
-        incidents.classList.add("hidden");
-    }
-}
-
-//Send Transfer event to Server
-function send_transfer() {
-    var id = document.getElementById("card_title").innerHTML;
-    var email = document.getElementById("to").value;
-    var time = "";
-    if (document.getElementById("t1").checked) {
-        time = document.getElementById("t1").value;
-    }
-    if (document.getElementById("t2").checked) {
-        time = document.getElementById("t2").value;
-    }
-    if (document.getElementById("t3").checked) {
-        time = document.getElementById("t3").value;
-    }
-    var json = { id: id, email: email, time: time };
-    socket.emit("transfer", json);
-}
-//Export Evidence event to Server
-function export_evidence() {
-    var id = document.getElementById("card_title").innerHTML;
-    var email = document.getElementById("to").value;
-    var time = "";
-    if (document.getElementById("t1").checked) {
-        time = document.getElementById("t1").value;
-    }
-    if (document.getElementById("t2").checked) {
-        time = document.getElementById("t2").value;
-    }
-    if (document.getElementById("t3").checked) {
-        time = document.getElementById("t3").value;
-    }
-    var json = { id: id, email: email, time: time };
-    socket.emit("export", json);
-}
 //Delete User event to Server
 
 alertMessage.addEventListener("cancel", (e) => {
@@ -925,7 +707,7 @@ function state(value) {
                 break;
             default:
         }
-    } else if (value == "Resolvido" || value == "Encerrado") {
+    } else if (value == "Resolvido") {
         switch (currentState) {
             case "Em Progresso":
                 json.comment = "Evento Resolvido : " + json.comment;
@@ -949,7 +731,6 @@ function state(value) {
                 socket.emit("state", json);
                 break;
             case "Resolvido":
-            case "Encerrado":
                 break;
             default:
         }
@@ -990,12 +771,11 @@ function masiveState(value, id, obj_id) {
     if (value == "Em Progresso") {
         switch (currentState) {
             case "Resolvido":
-            case "Encerrado":
                 break;
             case "Alarme Falso":
                 break;
             case "Novo":
-                json.comment += "Evento registrado massivamente";
+                json.comment += "Evento registrado em massa";
                 json.response_time = localtimeString;
                 console.log("masiveState state", json, "currentState", currentState);
                 socket.emit("state", json);
@@ -1026,7 +806,6 @@ function masiveState(value, id, obj_id) {
                 socket.emit("state", json);
                 break;
             case "Resolvido":
-            case "Encerrado":
                 break;
             default:
         }
@@ -1082,43 +861,6 @@ function procedure(procedure) {
     //console.log('procedure')
     document.getElementById("card_procedure").innerHTML = procedure;
     socket.emit("state", json);
-}
-
-//Send Report Query to server
-function reports(event) {
-    event.preventDefault();
-    var dir = document.getElementById("overlaydiv");
-    dir.classList.remove("hidden");
-    var inc = document.getElementById("formreports");
-    inc.classList.add("hidden");
-
-    var incident_select = document.getElementById("incidents-list");
-    incident_select = incident_select.options[incident_select.selectedIndex].value;
-    //usuario
-    var state_select = document.getElementById("state-list");
-    state_select = state_select.options[state_select.selectedIndex].text;
-    // id de reconocedores
-    var cam_selected = [];
-    var cam_select = document.getElementById("cam_select");
-    for (var i = 0; i < cam_select.options.length; i++) {
-        if (cam_select.options[i].selected) {
-            cam_selected.push(cam_select.options[i].value);
-        }
-    }
-    var date = document.getElementById("reservationtime").value;
-    var arrayDefechas = date.split(" - ");
-    var date1 = arrayDefechas[0];
-    var date2 = arrayDefechas[1];
-    var db = {
-        incident: incident_select,
-        state: state_select,
-        dates: { initial: date1, final: date2 },
-        cameras: cam_selected,
-    };
-
-    socket.emit("query", db);
-
-    //sow overlaydiv
 }
 
 // Filter Incidents  main Table
@@ -1184,15 +926,18 @@ function filter() {
             td3 = tr[i].getElementsByTagName("td")[8]; // State
             td4 = tr[i].getElementsByTagName("td")[4]; // ID
             td5 = tr[i].getElementsByTagName("td")[2]; // Priority
+            td6 = tr[i].getElementsByTagName("td")[6]; // Event
             // td5 = td5.getElementsByTagName("button")[0];   // ID
 
             // Filter By Name
             if (td1 && filtername != "") {
                 txtValue = td1.textContent || td1.innerText; // 2
-                txtValue2 = td4.textContent || td4.innerText; // 2
+                txtValue2 = td6.textContent || td6.innerText; // 2
+                txtValue3 = td4.textContent || td4.innerText; // 2
                 var f_name = txtValue.toUpperCase().indexOf(filtername) > -1;
-                var f_id = txtValue2.toUpperCase().indexOf(filtername) > -1;
-                f1 = f_name || f_id;
+                var f_event = txtValue2.toUpperCase().indexOf(filtername) > -1;
+                var f_id = txtValue3.toUpperCase().indexOf(filtername) > -1;
+                f1 = f_name || f_id || f_event;
             } else f1 = true;
 
             // Filter By Incident
@@ -1246,54 +991,6 @@ function filter() {
         console.log(e);
     }
 }
-//filter function
-
-/*function filterByAbonado() {
-    var input;
-    input = document.getElementById("filterByAbonado");
-    filterAb = input.value.toUpperCase();
-    try {
-        table = document.getElementById("nametable");
-        //console.log(filtername,filterincident,filterstate)   //2 Y ARMED
-        tr = table.getElementsByTagName("tr");
-        var rows = table.getElementsByTagName("tr");
-        for (i = 1; i < tr.length; i++) {
-            var cells = rows[i].getElementsByTagName("td");
-                var showRow = false;
-            for (var j = 0; j < cells.length; j++) {
-                var cellValue = cells[j].textContent.toUpperCase();
-               // console.log(cellValue)
-                if (cellValue.indexOf(filterAb) > -1) {
-                    showRow = true;
-                    break;
-                }
-            }
-            if (showRow) {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
-
-    }//End try
-    catch (e) {
-        console.log(e)
-    }
-}*/
-const filterByAbonado = () => {
-    const filterAb = document.getElementById("filterByAbonado").value.toUpperCase();
-    try {
-        const table = document.getElementById("nametable");
-        const rows = Array.from(table.getElementsByTagName("tr"));
-        rows.slice(1).forEach((row) => {
-            const cells = Array.from(row.getElementsByTagName("td"));
-            const showRow = cells.some((cell) => cell.textContent.toUpperCase().includes(filterAb));
-            row.style.display = showRow ? "" : "none";
-        });
-    } catch (e) {
-        console.error(e);
-    }
-};
 
 //keyboard shortcuts
 document.querySelector("#table").addEventListener(
@@ -1490,6 +1187,34 @@ function play() {
         console.log(e);
     }
 }
+
+function facex() {
+    const ip_address = "localhost";
+    const rest_api_port = "8888";
+    const auth = { Authorization: `Basic ${btoa("Admin:123")}` };
+
+    var row_id = document.getElementById("card_title").innerHTML;
+    var specificTdElement = document.querySelectorAll('[tabindex="' + row_id + '"]');
+    var params = specificTdElement[0].querySelector("#params").textContent;
+
+    if (!params.includes("detection")) return;
+
+    var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
+
+    try {
+        fetch(`http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId}`, { method: "GET", headers: auth })
+            .then((response) => response.json())
+            .then((json) => {
+                ISScustomAPI.sendEvent("CAM", "1", "FACE_X_INFO", JSON.stringify({ cam_name: json.data.name, params: params }));
+            })
+            .catch((e) => {
+                confirm(e);
+            });
+    } catch (e) {
+        document.getElementById("test").innerHTML = e;
+    }
+}
+
 //Live Button
 function live() {
     var cam_id = document.getElementById("card_title").innerHTML;
@@ -1531,4 +1256,18 @@ function dateYYYYMMDD(date) {
     var y = date.getFullYear();
     return y + "-" + (m <= 9 ? "0" + m : m) + "-" + (d <= 9 ? "0" + d : d);
 }
+
+function timeHHMMSS(date) {
+    return date.toLocaleTimeString().split(":").join("-");
+}
+
+function formattedDateTime(date) {
+    return dateToDDMMYY(date) + "_" + timeHHMMSS(date);
+}
 ////////// end securOS section //////////////////////
+
+window.addEventListener("click", () => {
+    if (document.querySelector(".table-selected > #type").innerHTML != "FACE_X")
+        document.querySelector("#face_x_btn").setAttribute("hidden", "true");
+    else document.querySelector("#face_x_btn").removeAttribute("hidden");
+});

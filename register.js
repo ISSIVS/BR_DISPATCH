@@ -10,13 +10,12 @@ var password = config.restapi_pass;
 //EDIT FOR EACH EVENT SUBSCRIPTION
 var events = [
     {
-        type: "CAM",
+     	type: "CAM",
+        action: "VCA_EVENT"
     },
     {
         type: "FACE_X_SERVER",
-    },
-    {
-        type: "GENERIC_USER"
+        action:"MATCH"
     }
 ];
 /////////////////////////////////////////////

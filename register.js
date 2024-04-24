@@ -16,6 +16,9 @@ var events = [
     {
         type: "FACE_X_SERVER",
         action:"MATCH"
+    },
+    {
+        type: "HTTP_EVENT_PROXY",
     }
 ];
 /////////////////////////////////////////////

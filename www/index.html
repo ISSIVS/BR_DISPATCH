@@ -22,6 +22,7 @@
                 padding: 5px;
                 text-align: center;
                 border: 1px rgb(11, 8, 43) solid;
+                word-wrap: break-word;
             }
             .table th {
                 padding: 0.75rem;
@@ -77,23 +78,6 @@
                     placeholder="Filtrar por nome, ID ou evento..."
                 />
             </div>
-            <!-- Filter by Priority -->
-            <div hidden="true" class="col-md-3 filters" id="filters">
-                <select
-                    class="form-control selectpicker select"
-                    multiple
-                    data-live-search="true"
-                    onchange="filterByIncident(this)"
-                    style="width: 100%"
-                    tabindex="-1"
-                    aria-hidden="true"
-                    id="filterbyincident"
-                >
-                    <option value="Alta">Alta</option>
-                    <option value="Média">Média</option>
-                    <option value="Baixa">Baixa</option>
-                </select>
-            </div>
             <!-- Filter by State -->
             <div class="col-md-3 filters" id="filters">
                 <select
@@ -141,8 +125,8 @@
                             <th hidden="true" data-field="priority" width="50px" class="to_hide">
                                 <i class="fa fa-info-circle fa_header" aria-hidden="true"></i>
                             </th>
-                            <th data-field="object" class="to_hide" width="70px">Objeto</th>
-                            <th data-field="id_obj" width="100px">ID</th>
+                            <th data-field="object" class="to_hide" width="100px">Objeto</th>
+                            <th data-field="id_obj" width="70px">ID</th>
                             <th data-field="name" width="20%">Nome</th>
                             <th data-field="event" width="20%">Evento</th>
                             <th data-field="time" width="210px">
@@ -156,11 +140,11 @@
                             </th>
                             <th data-field="response_time" class="to_hide" width="100px">
                                 <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resposta</span>
-                                <i id="check1" class="fa-solid fa-check fa_header icono-boton" onclick="check1()"></i>
+                                <i title="1" id="check1" class="fa-solid fa-check fa_header icono-boton" onclick="check1()"></i>
                             </th>
                             <th data-field="resolution_time" class="to_hide" width="100px">
                                 <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resolução</span>
-                                <i id="check2" class="fa-solid fa_header fa-check-double icono-boton" onclick="check2()"></i>
+                                <i title="2" id="check2" class="fa-solid fa_header fa-check-double icono-boton" onclick="check2()"></i>
                             </th>
                             <th hidden="true" data-field="action" class="to_hide">Comentário</th>
                             <th hidden="true" data-field="action" class="to_hide">Evento SecurOS</th>
@@ -272,8 +256,7 @@
 
                 <div class="card hidden" id="transferCard">
                     <div class="row">
-                        <div class="col">
-                        </div>
+                        <div class="col"></div>
                     </div>
                 </div>
                 <div id="contactCard"></div>
@@ -288,6 +271,7 @@
         <!-- HTML END-->
     </body>
     <!-- Scripts-->
+
     <script src="js/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>

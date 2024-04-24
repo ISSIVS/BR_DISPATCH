@@ -74,7 +74,11 @@ async function thread(json, callback) {
         if (json[i].response_time == null) table += '<td width="100px" id="responsetime"></td>';
         else table += '<td width="100px" id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
         if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"></td>';
-        else table += '<td width="100px" id="resolution_time">' + new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) + "</td>";
+        else
+            table +=
+                '<td width="100px" id="resolution_time">' +
+                new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) +
+                "</td>";
         table += '<td hidden="true" id="comment">' + json[i].comment + "</td>";
         table += '<td hidden="true" id="action">' + json[i].action + "</td>";
         table += '<td hidden="true" id="priority">' + json[i].priority + "</td>";
@@ -187,6 +191,12 @@ function addToTable(json) {
                 json[i].type = "FACE_X";
             }
 
+            if (json[i].type == "HTTP_EVENT_PROXY") {
+                json[i].type = "EVENT_GATE";
+                json[i].incident = "Instrusão detectada";
+                json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
+            }
+
             if (json[i].action == "VCA_EVENT") {
                 json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
             }
@@ -205,10 +215,10 @@ function addToTable(json) {
                     table +=
                         '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
             }
-            if (json[i].type == "GENERIC_USER") table += '<td id="type" width="70px" >' + "USER" + "</td>";
-            else table += '<td id="type" width="70px" >' + json[i].type + "</td>";
+            if (json[i].type == "GENERIC_USER") table += '<td id="type" width="100px" >' + "USER" + "</td>";
+            else table += '<td id="type" width="100px" >' + json[i].type + "</td>";
 
-            table += '<td id="object_id" width="100px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
+            table += '<td id="object_id" width="70px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
             table += '<td id="name" width="20%">' + json[i].name + "</td>";
             table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
             table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
@@ -296,6 +306,16 @@ function buildTable(json) {
             json[i].type = "FACE_X";
         }
 
+        if (json[i].type == "HTTP_EVENT_PROXY") {
+            json[i].type = "EVENT_GATE";
+            json[i].incident = "Instrusão detectada";
+            try {
+                json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
+            } catch (e) {
+                json[i].camera_id = json[i].cam_id;
+            }
+        }
+
         if (json[i].action == "VCA_EVENT") {
             json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
         }
@@ -314,10 +334,10 @@ function buildTable(json) {
                 table +=
                     '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
         }
-        if (json[i].type == "GENERIC_USER") table += '<td id="type" width="70px" >' + "USER" + "</td>";
-        else table += '<td id="type" width="70px" >' + json[i].type + "</td>";
+        if (json[i].type == "GENERIC_USER") table += '<td id="type" width="100px" >' + "USER" + "</td>";
+        else table += '<td id="type" width="100px" >' + json[i].type + "</td>";
 
-        table += '<td id="object_id" width="100px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
+        table += '<td id="object_id" width="70px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
         table += '<td id="name" width="20%">' + json[i].name + "</td>";
         table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
         table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
@@ -326,7 +346,9 @@ function buildTable(json) {
         if (json[i].response_time == null) table += '<td width="100px" id="responsetime"  class="to_hide"></td>';
         else
             table +=
-                '<td width="100px" id="responsetime"  class="to_hide">' + new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) + "</td>";
+                '<td width="100px" id="responsetime"  class="to_hide">' +
+                new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) +
+                "</td>";
         if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"  class="to_hide"></td>';
         else
             table +=
@@ -1121,6 +1143,23 @@ function check2() {
     var check = document.getElementById("seleccionarTodos");
     check.classList.remove("clicked");
 }
+
+// Count checked events and show in the title
+document.querySelector("[data-field=response_time]").addEventListener("mouseover", () => {
+    const checkedEvents = document.querySelectorAll("[id*=check_]:checked").length;
+    const eventosString = checkedEvents === 1 ? "evento" : "eventos";
+    const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ficar${checkedEvents === 1 ? "á" : "ão"} em progresso`;
+
+    document.querySelector("#check1 > title").textContent = texto
+});
+
+document.querySelector("[data-field=resolution_time]").addEventListener("mouseover", () => {
+    const checkedEvents = document.querySelectorAll("[id*=check_]:checked").length;
+    const eventosString = checkedEvents === 1 ? "evento" : "eventos";
+    const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ser${checkedEvents === 1 ? "á" : "ão"} resolvido${checkedEvents === 1 ? "" : "s"}`;
+
+    document.querySelector("#check2 > title").textContent = texto
+});
 
 //SecurOS User Functions
 //Play Button

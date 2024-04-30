@@ -17,7 +17,7 @@ function update_comments(comments)
         var messages = mod ? '<div class="chat_list active_chat">' : '<div class="chat_list active_chat even">'
         messages +='<div class="chat_people">'
         messages +='<div class="chat_ib">'
-        messages +='<h5>'+comments[i].user+'<span class="chat_date">'+ new Date(comments[i].date).toLocaleDateString("es-CO", options2)+'</span></h5>'
+        messages +='<h5>'+comments[i].user+'<span class="chat_date">'+ new Date(comments[i].date).toLocaleDateString("pt-br", options2)+'</span></h5>'
         messages +='<p>'+comments[i].comment+'</p>'
         messages +=' </div>'
         messages +='</div>'

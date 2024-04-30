@@ -38,7 +38,7 @@ alertMessage(msg, type) {
             ${msg}
             <div id="buttons" class="text-right"> </div>
             <button type="button" onclick="alertMessage.check()" class="btn btn-success">Sim</button>
-            <button type="button" onclick="alertMessage.cancel()" class="btn btn-danger">NÃ£o</button>
+            <button type="button" onclick="alertMessage.cancel()" class="btn btn-danger">Não</button>
             </div> `
             break
     }

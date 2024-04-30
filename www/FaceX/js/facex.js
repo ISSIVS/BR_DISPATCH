@@ -1,6 +1,20 @@
+﻿var recognition;
+
 ISScustomAPI.subscribe("CAM", "1", "FACE_X_INFO");
+
+// NEW
+ISScustomAPI.subscribe("CAM", "1", "CLEAR");
+//
+
 ISScustomAPI.onEvent((type, id, action, params) => {
-    window.document.getElementById("recognition-list").innerHTML = "";
+    // NEW
+    if (action == "CLEAR") {
+        recognition.innerHTML = ``;
+        return;
+    }
+    //
+
+    document.getElementById("recognition-list").innerHTML = "";
     let addNewRecognition = "";
 
     let data = JSON.parse(params.params).comment;
@@ -12,17 +26,23 @@ ISScustomAPI.onEvent((type, id, action, params) => {
     let camName = params.cam_name;
 
     let watchlistName = params2.list.name;
-    let recognitionImgSrc = `http://${serverIp}:21093${params2.matched_person_face_image._links.source}`;
-    let watchlistImgSrc = `http://${serverIp}:21093${params2._links.detection_image}`;
+
+    let recognitionImgSrc = `http://${serverIp.split(":")[0]}:21093${params2.matched_person_face_image._links.source}`;
+    let watchlistImgSrc = `http://${serverIp.split(":")[0]}:21093${params2._links.detection_image}`;
+
     let similarity = Number(params2.similarity).toFixed(2) * 100;
     let personName = params2.person.first_name + " " + params2.person.middle_name + " " + params2.person.last_name;
     let timestamp = convertUTCDate(params2.timestamp);
 
-    if (priority == 0) { addNewRecognition = "recognition"; } 
-    else if (priority == 1) { addNewRecognition = "info-recognition"; } 
-    else { addNewRecognition = "white-recognition"; }
+    if (priority == 0) {
+        addNewRecognition = "recognition";
+    } else if (priority == 1) {
+        addNewRecognition = "info-recognition";
+    } else {
+        addNewRecognition = "white-recognition";
+    }
 
-    var recognition = document.createElement("div");
+    recognition = document.createElement("div");
     recognition.innerHTML = `
             <div class="${addNewRecognition}">
                 <div class="software-images">

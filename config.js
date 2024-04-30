@@ -1,10 +1,10 @@
 // SecurOS 10.8  EventViewer HTML5 //
 
 //Securos  Information
-var Securos_Server_IP = "localhost";//"10.62.112.20";
+var Securos_Server_IP = "10.179.4.91";
 //Rest Api credentials 
 var RestApi_port = '8888';
-var RestApi_user = 'Admin';
+var RestApi_user = 'dispatch';
 var RestApi_pass = '123';
 
 var mailfrom = "";

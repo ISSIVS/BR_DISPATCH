@@ -1,4 +1,4 @@
-var express = require("express");
+﻿var express = require("express");
 var app = express();
 var http = require("http");
 var server = http.createServer(app);
@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "www")));
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "origin-list");
-    res.setHeader("Access-Control-Allow-Origin", "http://192.168.10.33:21093/v1/spotter/person/1");
+    res.setHeader("Access-Control-Allow-Origin", "http://192.168.10.105:21093/v1/spotter/person/1");
     res.header(
         "Access-Control-Allow-Headers",
         "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method"
@@ -76,6 +76,7 @@ app.post("/events", function (req, res) {
                         //req.body[0].cam_id = res.params != undefined ?  res.params.camera_id || res.id :"NOCAMID";
                         logs.Write("body: " + JSON.stringify(req.body[0]), "DEBUG", log_base_path);
 
+			if(!(req.body[0].action == "VCA_EVENT" || req.body[0].action == "MATCH" )) return
                         message.insert("events", req.body[0], function () {
                             //actualizo HTML5
                             message.select("events", 10, function (res) {
@@ -83,6 +84,7 @@ app.post("/events", function (req, res) {
                                 io.emit("newEvent", res);
                             });
                         });
+                        
                     } else {
                         console.log("Object not found");
                         logs.Write("Object not found", "ERROR", log_base_path + "_Events_not_found");
@@ -114,6 +116,12 @@ io.on("connection", function (socket) {
             //logs.Write(`events  1000 : ${res}`, "DEBUG", log_base_path);
             socket.emit("Events", res);
         });
+    });
+
+    message.select("directory", 2000, function (res) {
+        //Send Directory to html
+        //logs.Write(`directory  2000 : ${res}`, "DEBUG", log_base_path);
+        socket.emit("directory", res);
     });
 
     socket.on("abonado", (id, obj_id) => {
@@ -182,6 +190,65 @@ io.on("connection", function (socket) {
         }
         message.insert("logs", log, function (e) {
             logs.Write(`message.insert "logs": ${e}`, "DEBUG", log_base_path);
+        });
+    });
+
+    //Reports
+    socket.on("query", (json) => {
+        query(json, function (res) {
+            socket.emit("queryResult", res);
+        });
+    });
+
+    //Add new user
+    socket.on("newuser", (json) => {
+        message.insert("directory", json, function () {
+            message.select("directory", 2000, function (res) {
+                //Send Directory
+                socket.emit("directory", res);
+            });
+        });
+    });
+
+    //Delete user
+    socket.on("deleteUser", (json) => {
+        message._delete("directory", json, function () {
+            message.select("directory", 2000, function (res) {
+                //Send Directory
+                io.emit("directory", res);
+            });
+        });
+    });
+
+    //Get Directory
+    socket.on("getDirectory", () => {
+        console.log("getDirectory ");
+        message.select("directory", 2000, function (res) {
+            //envio a html las filas
+            socket.emit("directory", res);
+        });
+    });
+
+    //Transfer
+    socket.on("transfer", (json) => {
+        message.search("events", json.id, function (res) {
+            if (res.length > 0) {
+                res[0].email = json.email;
+                res[0].duration = json.time;
+                logs.Write(`transfer : ${res}`, "DEBUG", log_base_path);
+                email.mail(res[0]);
+            }
+        });
+    });
+    //Export
+    socket.on("export", (json) => {
+        message.search("events", json.id, function (res) {
+            if (res.length > 0) {
+                res[0].email = json.email;
+                res[0].duration = json.time;
+                logs.Write(`export : ${res}`, "DEBUG", log_base_path);
+                email.just_export(res[0]);
+            }
         });
     });
 });
@@ -324,7 +391,11 @@ function query(data, callback) {
             if (res != null) {
                 //console.log("fechas:" + JSON.stringify(data.dates));
                 //console.log(res.length, " resultados encontrados");
+                csv.genCSV(res);
                 callback(res);
+
+                /* pdf.genPDF(res.rows, data.dates);
+                csv.genCSV(res.rows); */
             } else callback(null);
         });
     } else callback(null);
@@ -368,10 +439,6 @@ function classification(e, callback) {
                         console.log("Evento de analítico de vídeo--------", e.params.description);
                         e.incident = e.params.description;
 
-                        break;
-                    case "PEDRO":
-                        console.log("Evento do Pedro");
-                        e.incident = e.params.description;
                         break;
                     default:
                         e.incident = "Camera event";

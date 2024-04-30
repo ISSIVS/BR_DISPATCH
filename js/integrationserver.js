@@ -20,6 +20,8 @@ class integrationServer{
 	
 	getObject(info,callback)
 	{
+       
+ 
         var json = {"id" : info.object_id,
                 "type" :info.type}
 

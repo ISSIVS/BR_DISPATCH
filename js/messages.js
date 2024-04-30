@@ -60,12 +60,23 @@ function insert(table, json, callback) {
         }
     }
     insertQuery = insertQuery + ` )`;
- 
+
+    if (table == "events" && (json.action == "VCA_EVENT" || json.action == "MATCH")) {
         pg.query(insertQuery, function (res) {
             console.log(insertQuery);
             console.log("Inserting Field into table events...");
             callback("Row inserted");
         });
+    } else if (table !== "events") {
+        pg.query(insertQuery, function (res) {
+            console.log(insertQuery);
+            console.log("Inserting Field into table events...");
+           callback("Row inserted");
+        });
+    } else {
+        console.log("Skipped insertion for value:", json.action);
+        callback("Skipped insertion for value: " + json.action);
+    }
 }
 
 function update(id, table, json, callback) {

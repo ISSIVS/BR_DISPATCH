@@ -1,23 +1,23 @@
-<html>
+﻿<html>
     <head>
         <meta charset="utf-8" />
 
         <script src="socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link href="css/datepicker.css" rel="stylesheet" type="text/css" />
+        <link href="/css/datepicker.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
         <link rel="stylesheet" href="bower_components/bootstrap-daterangepicker/daterangepicker.css" />
         <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css" />
         <link rel="stylesheet" href="css/cssadittional.css" />
-        <link rel="stylesheet" href="css/bootstrap-select.css" />
+        <link rel="stylesheet" href="/css/bootstrap-select.css" />
         <link rel="stylesheet" href="css/css.css" />
         <link rel="stylesheet" href="css/messages.css" />
-        <script type="text/javascript" src="js/ajax_libs_jszip_3.1.3_jszip.min.js"></script>
-        <script type="text/javascript" src="js/ajax_libs_pdfmake_0.1.53_pdfmake.min.js"></script>
-        <script type="text/javascript" src="js/ajax_libs_pdfmake_0.1.53_vfs_fonts.js"></script>
-        <link rel="icon" href="images/logos securOS__S.png" type="image/x-icon" />
-        <title>SecurOS - GEA</title>
-        <style>
+        <link rel="icon" href="images/logos securOS__S.png" type="image/x-icon">
+        <title>SecurOS - Simplified Dispatcher Module</title>
+	<style>
+            .table tr:nth-child(even) {
+                background-color: #353d55;
+            }
             .table td {
                 padding: 5px;
                 text-align: center;
@@ -91,9 +91,11 @@
                 >
                     <option selected="selected" value="All">Todos os estados</option>
                     <option value="Novo">Novo</option>
-                    <option value="Em progresso">Em progresso</option>
-                    <option value="Resolvido">Resolvido</option>
-                    <option value="Alarme Falso">Alarme Falso</option>
+                    <option value="Reconhecido">Reconhecido</option>
+                    <option value="Em Tratamento">Em Tratamento</option>
+                    <option value="Solucionado">Solucionado</option>
+                    <option value="Alarme Falso">Falha de Sistema</option>
+                    <option value="Alarme Falso">Alarme</option>
                 </select>
             </div>
             <!-- Filter by Date-Time -->
@@ -186,9 +188,6 @@
                                 <button class="btn btn-primary" onclick="live()" type="button">
                                     <i class="fa fa-video-camera" aria-hidden="true"></i>
                                 </button>
-                                <button hidden="false" id="face_x_btn" class="btn btn-warning" onclick="facex()" type="button">
-                                    <i class="fa fa-person" aria-hidden="true"></i>
-                                </button>
                                 <button
                                     class="btn btn-info dropdown-toggle"
                                     type="button"
@@ -201,11 +200,11 @@
                                         <!-- Submenu State -->
                                         <a class="dropdown-menu dropdown-toggle" href="#" data-toggle="dropdown">Mudar Estado</a>
                                         <div class="dropdown-submenu">
-                                            <a class="dropdown-item" href="#">Em Progresso</a>
-                                            <a class="dropdown-item" href="#">Resolvido</a>
-                                            <!-- <a class="dropdown-item"href="#">Cerrado</a> -->
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Alarme Falso</a>
+                                            <a class="dropdown-item" href="#">Reconhecido</a>
+                                            <a class="dropdown-item" href="#">Em Tratamento</a>
+                                            <a class="dropdown-item" href="#">Solucionado</a>
+                                            <a class="dropdown-item" href="#">Falha de Sistema</a>
+                                            <a class="dropdown-item" href="#">Alarme</a>
                                         </div>
                                     </ul>
                                 </button>
@@ -245,7 +244,7 @@
                         </div>
                         <div class="col-md-1">
                             <div class="form-row align-items-center">
-                                <button class="btn form-send btn-success" onclick="state('Em Progresso')">
+                                <button class="btn form-send btn-success" onclick="state('Em Tratamento')">
                                     <i class="fa fa-arrow-right" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -271,11 +270,10 @@
         <!-- HTML END-->
     </body>
     <!-- Scripts-->
-
-    <script src="js/jquery.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="/js/bootstrap-datepicker.js"></script>
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
     <!-- bootstrap datepicker -->
@@ -299,11 +297,13 @@
     <script src="bower_components/fastclick/lib/fastclick.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
-    <script src="js/bootstrap-select.min.js"></script>
+    <script src="/js/bootstrap-select.min.js"></script>
     <script src="js/alertMessage.js"></script>
     <script src="js/main.js"></script>
     <script src="js/datepicker.js"></script>
     <script src="js/comments.js"></script>
     <script src="js/font6js/all.min.js"></script>
     <script src="js/tableHTMLExport.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
 </html>

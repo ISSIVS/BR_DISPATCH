@@ -16,13 +16,17 @@ var startDateFilter, endDateFilter;
 
 var socket = io();
 socket.on("newEvent", function (msg) {
-    if (msg.length == 0) return;
+    msg = msg.filter(obj => obj.action === "MATCH" || obj.action === "VCA_EVENT");
+
+    if(msg.length == 0) return
 
     console.log("receiving new event :", msg);
     addToTable(msg);
 });
 socket.on("Events", function (msg) {
-    console.log("receiving event :", msg);
+    msg = msg.filter(obj => obj.action === "MATCH" || obj.action === "VCA_EVENT");
+
+    console.log('receiving event :', msg)
     buildTable(msg);
 });
 socket.on("directory", function (msg) {
@@ -40,23 +44,119 @@ socket.on("queryResult", function (msg) {
     buildReport(msg, function (msg) {});
 });
 
-document.addEventListener(
-    "focus",
-    function (event) {
-        const target = event.target;
-        if (target.tagName.toLowerCase() === "input") {
-            event.stopPropagation();
-        }
-    },
-    true
-);
+document.addEventListener('focus', function(event) {
+    const target = event.target;
+    if (target.tagName.toLowerCase() === 'input') {
+        event.stopPropagation();
+    }
+}, true);
 
 function incidents() {
     $(".nav-item").click(function (e) {
         //console.log(this);
         $(this).addClass("active").siblings().removeClass("active");
     });
+    var dir = document.getElementById("reports");
+    dir.classList.add("hidden");
+    var dir = document.getElementById("directory");
+    dir.classList.add("hidden");
+    //console.log('hidden directory')
     var inc = document.getElementById("incidents");
+    inc.classList.remove("hidden");
+}
+
+function directory() {
+    $(".nav-item").click(function (e) {
+        $(this).addClass("active").siblings().removeClass("active");
+    });
+
+    var dir = document.getElementById("directory");
+    dir.classList.remove("hidden");
+    //console.log('Showing Directory', dir)
+    var inc = document.getElementById("incidents");
+    inc.classList.add("hidden");
+    var dir = document.getElementById("reports");
+    dir.classList.add("hidden");
+    socket.emit("getDirectory", null);
+}
+
+function report() {
+    $(".nav-item").click(function (e) {
+        //console.log(this);
+        $(this).addClass("active").siblings().removeClass("active");
+    });
+    var dir = document.getElementById("reports");
+    dir.classList.remove("hidden");
+    var inc = document.getElementById("incidents");
+    inc.classList.add("hidden");
+    var inc = document.getElementById("directory");
+    inc.classList.add("hidden");
+}
+
+function buildCameras(msg) {
+    var json = JSON.parse(msg);
+    cameras = json;
+    var cam_select = document.getElementById("cam_select");
+    var len = json.data.length;
+    //console.log(len);
+    for (var i = 0; i < len; i++) {
+        cam_select.options[i] = new Option(json.data[i].name, json.data[i].id);
+        coordinates[i] = json.data[i].settings.coordinates;
+        console.log(json.data[i].settings.coordinates);
+    }
+}
+
+function buildNames(json) {
+    var table = "";
+    var options = '<option selected value="">Select</option>';
+    for (var i = 0; i < json.length; i++) {
+        table += '<tr class="table-row-names clickable-row " >';
+        table += '<th hidden="true" scope="row" id="id">' + json[i].id + "</th>";
+        table += '<td id="Fullname" min-width="100px" >' + json[i].person_name + "</td>";
+        table += '<td id="email" width="200px" >' + json[i].email_address + "</td>";
+        table += '<td id="phone" >' + json[i].phone_number + "</td>";
+        table += '<td id="title">' + json[i].title + "</td>";
+        table += '<td id="title">' + json[i].panel + "</td>";
+        table += "</tr>";
+
+        options += `<option value="${json[i].email_address}">${json[i].title} ${json[i].person_name} (${json[i].email_address})</option>`;
+    }
+    try {
+        const regex = /null/gi;
+        table = table.replace(regex, "");
+        options = options.replace(regex, "");
+
+        var rows = document.getElementById("rowsnames");
+        rows.innerHTML = table;
+
+        var rows = document.getElementById("to");
+        rows.innerHTML = options;
+
+        rows.classList.add("tbody");
+    } catch (e) {
+        document.getElementById("test").innerHTML = "Error 123:" + e;
+    }
+
+    $(document).ready(function ($) {
+        $(".table-row-names").click(function (e) {
+            //console.log(this);
+            $(this).addClass("table-selected").siblings().removeClass("table-selected");
+            //$('.table-selected td').addClass("table-selected")
+            var id = $(this)
+                .find("th#" + "id")
+                .html();
+            var fullnameSelected = $(this);
+            //console.log(id)
+            name_selected = id;
+            contact_selected = fullnameSelected;
+        });
+    });
+}
+
+function btnBackReport(event) {
+    var dir = document.getElementById("tablereports");
+    dir.classList.add("hidden");
+    var inc = document.getElementById("formreports");
     inc.classList.remove("hidden");
 }
 
@@ -71,14 +171,10 @@ async function thread(json, callback) {
         table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options) + "</td>";
         table += '<td id="state">' + json[i].state || "" + "</td>";
         table += '<td id="operator">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td width="100px" id="responsetime"></td>';
-        else table += '<td width="100px" id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
-        if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"></td>';
-        else
-            table +=
-                '<td width="100px" id="resolution_time">' +
-                new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) +
-                "</td>";
+        if (json[i].response_time == null) table += '<td id="responsetime"></td>';
+        else table += '<td id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
+        if (json[i].resolution_time == null) table += '<td id="resolution_time"></td>';
+        else table += '<td id="resolution_time">' + new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) + "</td>";
         table += '<td hidden="true" id="comment">' + json[i].comment + "</td>";
         table += '<td hidden="true" id="action">' + json[i].action + "</td>";
         table += '<td hidden="true" id="priority">' + json[i].priority + "</td>";
@@ -89,6 +185,35 @@ async function thread(json, callback) {
     callback(table);
 }
 
+function buildReport(json, callback) {
+    var title = document.getElementById("resultsTitle");
+    title.innerHTML =
+        '<h3><button class="btn btn-success search-btn btn-directory backReport" onclick="btnBackReport(event)">' +
+        '<i class="fa fa-backward" id="backReport" aria-hidden="true"></i></button>' +
+        " " +
+        json.length +
+        " Results</h3>";
+
+    thread(json, function (table) {
+        try {
+            const regex = /null/gi;
+            table = table.replace(regex, "");
+
+            var rows = document.getElementById("rowsResults");
+            rows.innerHTML = table;
+            rows.classList.add("tbody");
+
+            var dir = document.getElementById("tablereports");
+            dir.classList.remove("hidden");
+            var inc = document.getElementById("overlaydiv");
+            inc.classList.add("hidden");
+        } catch (e) {
+            document.getElementById("test").innerHTML = "Error 221: " + e;
+        }
+
+        callback("ok");
+    });
+}
 var tabindex = undefined;
 
 function btnProcedure(event) {
@@ -188,7 +313,7 @@ function addToTable(json) {
             }
 
             if (json[i].type == "FACE_X_SERVER") {
-                json[i].type = "FACE_X";
+                json[i].type = "FACEX";
             }
 
             if (json[i].type == "HTTP_EVENT_PROXY") {
@@ -199,6 +324,12 @@ function addToTable(json) {
 
             if (json[i].action == "VCA_EVENT") {
                 json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+            }
+
+            if (json[i].action == "CAR_LP_RECOGNIZED") {
+                json[i].name = JSON.parse(json[i].params).number;
+                json[i].object_id = JSON.parse(json[i].params).camera_id;
+                json[i].incident = "Placa reconhecida";
             }
 
             if (json[i].priority == "undefined") {
@@ -303,7 +434,7 @@ function buildTable(json) {
         }
 
         if (json[i].type == "FACE_X_SERVER") {
-            json[i].type = "FACE_X";
+            json[i].type = "FACEX";
         }
 
         if (json[i].type == "HTTP_EVENT_PROXY") {
@@ -318,6 +449,12 @@ function buildTable(json) {
 
         if (json[i].action == "VCA_EVENT") {
             json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+        }
+
+        if (json[i].action == "CAR_LP_RECOGNIZED") {
+            json[i].name = JSON.parse(json[i].params).number;
+            json[i].object_id = JSON.parse(json[i].params).camera_id;
+            json[i].incident = "Placa reconhecida";
         }
 
         if (json[i].priority == "undefined") {
@@ -397,8 +534,7 @@ function ready($) {
         $(document).on("dblclick", ".table-row", function () {
             try {
                 var cam_id = document.getElementById("card_id").innerHTML;
-                var params = document.getElementById("params").innerHTML;
-                console.log("On Click Incidents Rows to show cam_id", cam_id, params);
+                console.log("On Click Incidents Rows to show cam_id", cam_id);
                 var date = document.getElementById("card_incidentDate").innerHTML;
                 ISScustomAPI.sendReact("MEDIA_CLIENT", Média_client, "ADD_SEQUENCE", '{"mode":"1x1","seq":"' + cam_id + '"}');
             } catch (e) {
@@ -473,12 +609,58 @@ function ready($) {
     });
 }
 
+socket.on("abonado", function (contacts) {
+    console.log("socket.on(abonado) main.js contacts", contacts);
+    var item = document.getElementById("contactCard");
+    if (contacts) {
+        if (item.classList.contains("hidden")) {
+            item.classList.remove("hidden");
+        }
+        var table = document.getElementById("contactTable");
+        var rows = "";
+        var i = 1;
+        contacts.forEach((element) => {
+            rows += `<tr>
+                        <th scope="row">${i}</th>
+                        <td>${element.person_name}</td>
+                        <td>${element.title}</td>
+                        <td>${element.phone_number}</td>
+                    </tr>`;
+            i++;
+        });
+        table.innerHTML = rows;
+    }
+});
+
+//Function Add new User to DB
+function btnDir(e) {
+    e.preventDefault();
+    var form = document.getElementById("newuser");
+    var user = new FormData(form);
+    var newuser = {};
+    newuser.person_name = form.fullname.value;
+    newuser.email_address = form.email.value;
+    newuser.phone_number = form.phone.value;
+    newuser.title = form.title.value;
+    newuser.panel = form.panel.value;
+    form.fullname.value = "";
+    form.email.value = "";
+    form.phone.value = "";
+    form.title.value = "";
+    form.panel.value = "";
+    if (newuser.person_name == "" || newuser.email_address == "") {
+        //verification
+    } else {
+        socket.emit("newuser", newuser);
+    }
+}
+
 //-------------------------- JQUERYS Section -----------------
 
 //Activate Multiple Select filter for Incidents Type
 $(".select").selectpicker({ noneSelectedText: "Tipo de prioridade", width: "100%" });
 
-//Close Incidents TAB  deselect rows and goto top table
+//Close Inicidents TAB  deselect rows and goto top table
 $(".closeCard").click(function (e) {
     var rows = document.getElementById("incidentCard");
     var table = document.getElementById("tablediv");
@@ -493,57 +675,46 @@ $(".closeCard").click(function (e) {
     }
 });
 
+//Close Transfer Tab
+$(".closeCardTransfer").click(function (e) {
+    var rows = document.getElementById("transferCard");
+    var incidents = document.getElementById("incidentCards");
+    if (!rows.classList.contains("hidden")) {
+        rows.classList.add("hidden");
+    }
+    if (incidents.classList.contains("hidden")) {
+        incidents.classList.remove("hidden");
+    }
+});
+
+//Close Export Tab
+$(".closeCardExport").click(function (e) {
+    var rows = document.getElementById("exportCard");
+    var incidents = document.getElementById("incidentCards");
+    if (!rows.classList.contains("hidden")) {
+        rows.classList.add("hidden");
+    }
+    if (incidents.classList.contains("hidden")) {
+        incidents.classList.remove("hidden");
+    }
+});
+
 //dropdowns clicks functions
 $(".dropdown-item").click(function (e) {
     var action = e.currentTarget.innerHTML;
-    switch (action) {
-        case "Transferir":
-            transfer();
+    state(action);
+
+    /* switch (action) {
+        case "Em Tratamento":
+            state("Em Tratamento");
             break;
-        case "Export Evidence":
-            exportEvidence();
+        case "Solucionado":
+            state("Solucionado");
             break;
-        case "Em Progresso":
-            state("Em Progresso");
+        case "Falha de Sistema":
+            state("Falha de Sistema");
             break;
-        case "Resolvido":
-            state("Resolvido");
-            //console.log('Resolvido')
-            break;
-        case "Alarme Falso":
-            state("Alarme Falso");
-            break;
-        case "Prioridade Baixa":
-            priority("Baixa");
-            break;
-        case "Prioridade Média":
-            priority("Média");
-            break;
-        case "Prioridade Alta":
-            priority("Alta");
-            break;
-        case "Começou a monitorar o incidente":
-            procedure("Começou a monitorar o incidente");
-            break;
-        case "Parou de monitorar o incidente":
-            procedure("Parou de monitorar o incidente");
-            break;
-        case "Problema encaminhado ao supervisor":
-            procedure("Problema encaminhado ao supervisor");
-            break;
-        case "Chamado para a equipe de segurança local":
-            procedure("Chamado para a equipe de segurança local");
-            break;
-        case "Chamado pessoal de segurança de monitoramento central":
-            procedure("Chamado pessoal de segurança de monitoramento central");
-            break;
-        case "Chamado 190":
-            procedure("Chamado 190");
-            break;
-        case "Chamado para a manutenção para analisar o problema relacionado à câmera":
-            procedure("Chamado para a manutenção para analisar o problema relacionado à câmera");
-            break;
-    }
+    } */
 });
 
 //Start Datetimepicker for reports
@@ -594,20 +765,20 @@ $("#pdf").on("click", () => {
     var docDefinition = {
         pageOrientation: "landscape",
         content: [
-            { text: "Relatório - GEA", style: "header", alignment: "center" },
+            { text: "Relatório - Dispatch", style: "header", alignment: "center" },
             { text: "\n" },
             { text: new Date().toLocaleString(), style: "subheader", alignment: "center" },
             { text: "\n\n" },
             {
                 table: {
                     body: tableData,
-                    widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", 50, "auto", "auto"],
+		    widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", 50, "auto", "auto"],
                 },
             },
         ],
-        defaultStyle: {
+	defaultStyle: {
             fontSize: 8,
-            alignment: "center",
+            alignment: "center"
         },
         styles: {
             header: {
@@ -648,6 +819,64 @@ $("#csv").on("click", () => {
     }
 });
 
+//Transfer click
+function transfer() {
+    console.log("Transfer");
+    var incidents = document.getElementById("incidentCards");
+    var transfer = document.getElementById("transferCard");
+    if (transfer.classList.contains("hidden")) {
+        transfer.classList.remove("hidden");
+    }
+    if (!incidents.classList.contains("hidden")) {
+        incidents.classList.add("hidden");
+    }
+}
+//Export Evidence click
+function exportEvidence() {
+    var incidents = document.getElementById("incidentCards");
+    var exportCard = document.getElementById("exportCard");
+    if (exportCard.classList.contains("hidden")) {
+        exportCard.classList.remove("hidden");
+    }
+    if (!incidents.classList.contains("hidden")) {
+        incidents.classList.add("hidden");
+    }
+}
+
+//Send Transfer event to Server
+function send_transfer() {
+    var id = document.getElementById("card_title").innerHTML;
+    var email = document.getElementById("to").value;
+    var time = "";
+    if (document.getElementById("t1").checked) {
+        time = document.getElementById("t1").value;
+    }
+    if (document.getElementById("t2").checked) {
+        time = document.getElementById("t2").value;
+    }
+    if (document.getElementById("t3").checked) {
+        time = document.getElementById("t3").value;
+    }
+    var json = { id: id, email: email, time: time };
+    socket.emit("transfer", json);
+}
+//Export Evidence event to Server
+function export_evidence() {
+    var id = document.getElementById("card_title").innerHTML;
+    var email = document.getElementById("to").value;
+    var time = "";
+    if (document.getElementById("t1").checked) {
+        time = document.getElementById("t1").value;
+    }
+    if (document.getElementById("t2").checked) {
+        time = document.getElementById("t2").value;
+    }
+    if (document.getElementById("t3").checked) {
+        time = document.getElementById("t3").value;
+    }
+    var json = { id: id, email: email, time: time };
+    socket.emit("export", json);
+}
 //Delete User event to Server
 
 alertMessage.addEventListener("cancel", (e) => {
@@ -678,7 +907,7 @@ function state(value) {
         mili: "2-digit",
         hour12: false,
     });
-    var localTime = localTime + "." + isoDateTime.getMilliseconds();
+    localTime += "." + isoDateTime.getMilliseconds();
     var localtimeString = localDate + " " + localTime;
     var id = document.getElementById("card_title").innerHTML;
     var co = document.getElementById("card_comment").value;
@@ -696,74 +925,35 @@ function state(value) {
     };
     //console.log('json',json)
     document.getElementById("card_comment").value = "";
-    if (value == "Em Progresso") {
-        switch (currentState) {
-            case "Resolvido":
-            case "Encerrado":
-                json.comment = "Evento em progresso: " + json.comment;
+
+    switch (value) {
+        case "Em Tratamento":
+            if (["Solucionado", "Falha de Sistema", "Novo", "Reconhecido", "Alarme"].includes(currentState)) {
+                json.comment = "Evento em tratamento: " + json.comment;
                 json.response_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
                 break;
-            case "Alarme Falso":
-                json.comment = "Evento em progresso: " + json.comment;
-                json.response_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Novo":
-                json.comment = "Evento em progresso: " + json.comment;
-                json.response_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Em Progresso":
-                json.comment = "Evento em progresso: " + json.comment;
-                json.response_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            default:
-        }
-    } else if (value == "Resolvido") {
-        switch (currentState) {
-            case "Em Progresso":
-                json.comment = "Evento Resolvido : " + json.comment;
+            }
+
+        case "Solucionado":
+            if (["Em Tratamento", "Falha de Sistema", "Novo", "Reconhecido", "Alarme"].includes(currentState)) {
+                json.comment = "Evento solucionado : " + json.comment;
                 json.resolution_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Alarme Falso":
-                json.comment = "Evento Resolvido : " + json.comment;
-                json.resolution_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Novo":
-                json.comment = "Evento Resolvido : " + json.comment;
-                json.resolution_time = localtimeString;
-                document.getElementById("card_state").innerHTML = value;
-                console.log("function state state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Resolvido":
-                break;
-            default:
-        }
-    } else if (value == "Alarme Falso") {
-        json.resolution_time = localtimeString;
-        json.comment = "Alarme Falso : " + json.comment;
-        document.getElementById("card_state").innerHTML = value;
-        console.log("function state state", json, "currentState", currentState);
-        socket.emit("state", json);
+            }
+            break;
+        case "Falha de Sistema":
+        case "Reconhecido":
+        case "Alarme":
+            json.resolution_time = localtimeString;
+            json.comment = value + " : " + json.comment;
+            break;
+        default:
     }
+
+    document.getElementById("card_state").innerHTML = value;
+    console.log("function state state", json, "currentState", currentState);
+    socket.emit("state", json);
 }
+
 function masiveState(value, id, obj_id) {
     var isoDateTime = new Date();
     var localDate = dateYYYYMMDD(isoDateTime);
@@ -780,7 +970,6 @@ function masiveState(value, id, obj_id) {
     var auxid = document.querySelector('tr[tabindex="' + id + '"]');
     var currentState = auxid.querySelector("tr td#state").textContent;
     console.log("masiveState id ", currentState);
-    //var currentState = id.children;
 
     var json = {
         id: id,
@@ -790,47 +979,16 @@ function masiveState(value, id, obj_id) {
         comment: co,
     };
 
-    if (value == "Em Progresso") {
-        switch (currentState) {
-            case "Resolvido":
-                break;
-            case "Alarme Falso":
-                break;
-            case "Novo":
-                json.comment += "Evento registrado em massa";
-                json.response_time = localtimeString;
-                console.log("masiveState state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Em Progresso":
-                break;
-            default:
-        }
-    }
-    if (value == "Resolvido") {
-        switch (currentState) {
-            case "Em Progresso":
-                json.resolution_time = localtimeString;
-                json.comment += "Evento resolvido em massa";
-                console.log("masiveState state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Alarme Falso":
-                json.resolution_time = localtimeString;
-                json.comment += "Evento resolvido em massa";
-                console.log("masiveState state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Novo":
-                json.resolution_time = localtimeString;
-                json.comment += "Evento resolvido em massa";
-                console.log("masiveState state", json, "currentState", currentState);
-                socket.emit("state", json);
-                break;
-            case "Resolvido":
-                break;
-            default:
-        }
+    if (value == "Em Tratamento" && currentState == "Novo") {
+        json.comment += "Evento registrado em massa";
+        json.response_time = localtimeString;
+        console.log("masiveState state", json, "currentState", currentState);
+        socket.emit("state", json);
+    } else if (value == "Solucionado" && ["Em Tratamento", "Falha de Sistema", "Novo", "Reconhecido", "Alarme"].includes(currentState)) {
+        json.resolution_time = localtimeString;
+        json.comment += "Evento solucionado em massa";
+        console.log("masiveState state", json, "currentState", currentState);
+        socket.emit("state", json);
     }
 }
 //Send Update Priority event to server
@@ -883,6 +1041,43 @@ function procedure(procedure) {
     //console.log('procedure')
     document.getElementById("card_procedure").innerHTML = procedure;
     socket.emit("state", json);
+}
+
+//Send Report Query to server
+function reports(event) {
+    event.preventDefault();
+    var dir = document.getElementById("overlaydiv");
+    dir.classList.remove("hidden");
+    var inc = document.getElementById("formreports");
+    inc.classList.add("hidden");
+
+    var incident_select = document.getElementById("incidents-list");
+    incident_select = incident_select.options[incident_select.selectedIndex].value;
+    //usuario
+    var state_select = document.getElementById("state-list");
+    state_select = state_select.options[state_select.selectedIndex].text;
+    // id de reconocedores
+    var cam_selected = [];
+    var cam_select = document.getElementById("cam_select");
+    for (var i = 0; i < cam_select.options.length; i++) {
+        if (cam_select.options[i].selected) {
+            cam_selected.push(cam_select.options[i].value);
+        }
+    }
+    var date = document.getElementById("reservationtime").value;
+    var arrayDefechas = date.split(" - ");
+    var date1 = arrayDefechas[0];
+    var date2 = arrayDefechas[1];
+    var db = {
+        incident: incident_select,
+        state: state_select,
+        dates: { initial: date1, final: date2 },
+        cameras: cam_selected,
+    };
+
+    socket.emit("query", db);
+
+    //sow overlaydiv
 }
 
 // Filter Incidents  main Table
@@ -948,18 +1143,15 @@ function filter() {
             td3 = tr[i].getElementsByTagName("td")[8]; // State
             td4 = tr[i].getElementsByTagName("td")[4]; // ID
             td5 = tr[i].getElementsByTagName("td")[2]; // Priority
-            td6 = tr[i].getElementsByTagName("td")[6]; // Event
             // td5 = td5.getElementsByTagName("button")[0];   // ID
 
             // Filter By Name
             if (td1 && filtername != "") {
                 txtValue = td1.textContent || td1.innerText; // 2
-                txtValue2 = td6.textContent || td6.innerText; // 2
-                txtValue3 = td4.textContent || td4.innerText; // 2
+                txtValue2 = td4.textContent || td4.innerText; // 2
                 var f_name = txtValue.toUpperCase().indexOf(filtername) > -1;
-                var f_event = txtValue2.toUpperCase().indexOf(filtername) > -1;
-                var f_id = txtValue3.toUpperCase().indexOf(filtername) > -1;
-                f1 = f_name || f_id || f_event;
+                var f_id = txtValue2.toUpperCase().indexOf(filtername) > -1;
+                f1 = f_name || f_id;
             } else f1 = true;
 
             // Filter By Incident
@@ -1013,6 +1205,54 @@ function filter() {
         console.log(e);
     }
 }
+//filter function
+
+/*function filterByAbonado() {
+    var input;
+    input = document.getElementById("filterByAbonado");
+    filterAb = input.value.toUpperCase();
+    try {
+        table = document.getElementById("nametable");
+        //console.log(filtername,filterincident,filterstate)   //2 Y ARMED
+        tr = table.getElementsByTagName("tr");
+        var rows = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) {
+            var cells = rows[i].getElementsByTagName("td");
+                var showRow = false;
+            for (var j = 0; j < cells.length; j++) {
+                var cellValue = cells[j].textContent.toUpperCase();
+               // console.log(cellValue)
+                if (cellValue.indexOf(filterAb) > -1) {
+                    showRow = true;
+                    break;
+                }
+            }
+            if (showRow) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+
+    }//End try
+    catch (e) {
+        console.log(e)
+    }
+}*/
+const filterByAbonado = () => {
+    const filterAb = document.getElementById("filterByAbonado").value.toUpperCase();
+    try {
+        const table = document.getElementById("nametable");
+        const rows = Array.from(table.getElementsByTagName("tr"));
+        rows.slice(1).forEach((row) => {
+            const cells = Array.from(row.getElementsByTagName("td"));
+            const showRow = cells.some((cell) => cell.textContent.toUpperCase().includes(filterAb));
+            row.style.display = showRow ? "" : "none";
+        });
+    } catch (e) {
+        console.error(e);
+    }
+};
 
 //keyboard shortcuts
 document.querySelector("#table").addEventListener(
@@ -1144,23 +1384,6 @@ function check2() {
     check.classList.remove("clicked");
 }
 
-// Count checked events and show in the title
-document.querySelector("[data-field=response_time]").addEventListener("mouseover", () => {
-    const checkedEvents = document.querySelectorAll("[id*=check_]:checked").length;
-    const eventosString = checkedEvents === 1 ? "evento" : "eventos";
-    const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ficar${checkedEvents === 1 ? "á" : "ão"} em progresso`;
-
-    document.querySelector("#check1 > title").textContent = texto
-});
-
-document.querySelector("[data-field=resolution_time]").addEventListener("mouseover", () => {
-    const checkedEvents = document.querySelectorAll("[id*=check_]:checked").length;
-    const eventosString = checkedEvents === 1 ? "evento" : "eventos";
-    const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ser${checkedEvents === 1 ? "á" : "ão"} resolvido${checkedEvents === 1 ? "" : "s"}`;
-
-    document.querySelector("#check2 > title").textContent = texto
-});
-
 //SecurOS User Functions
 //Play Button
 function play() {
@@ -1227,11 +1450,45 @@ function play() {
     }
 }
 
-function facex() {
-    const ip_address = "localhost";
-    const rest_api_port = "8888";
-    const auth = { Authorization: `Basic ${btoa("Admin:123")}` };
+// FaceX Function
+// New
+window.addEventListener("click", () => {
+    if (document.querySelector(".table-selected > #type").innerHTML != "FACEX") {
+        try {
+            ISScustomAPI.sendEvent("CAM", "1", "CLEAR");
+        } catch (e) {
+            document.getElementById("test").innerHTML = e;
+        }
+    } else {
+        const ip_address = "10.179.4.91";
+        const rest_api_port = "8888";
+        const auth = { Authorization: `Basic ${btoa("dispatch:123")}` };
 
+        var params = document.querySelector(".table-selected > #params").textContent;
+
+        if (!params.includes("detection")) return;
+
+        var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
+
+        try {
+            fetch(`http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId.replace("#","%23")}`, { method: "GET", headers: auth })
+                .then((response) => response.json())
+                .then((json) => {
+                    ISScustomAPI.sendEvent("CAM", "1", "FACE_X_INFO", JSON.stringify({ cam_name: json.data.name, params: params }));
+                })
+                .catch((e) => {
+                    document.getElementById("test").innerHTML = e;
+                    console.log(e);
+                });
+        } catch (e) {
+            document.getElementById("test").innerHTML = e;
+        }
+    }
+});
+//
+
+function facex() {
+    
     var row_id = document.getElementById("card_title").innerHTML;
     var specificTdElement = document.querySelectorAll('[tabindex="' + row_id + '"]');
     var params = specificTdElement[0].querySelector("#params").textContent;
@@ -1241,17 +1498,32 @@ function facex() {
     var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
 
     try {
-        fetch(`http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId}`, { method: "GET", headers: auth })
+        
+        fetch(`http://10.179.4.91:8888/api/v1/cameras/${camId.replace("#","%23")}`, { method: "GET", headers: { Authorization: "Basic " + btoa("dispatch:123") } })
             .then((response) => response.json())
             .then((json) => {
-                ISScustomAPI.sendEvent("CAM", "1", "FACE_X_INFO", JSON.stringify({ cam_name: json.data.name, params: params }));
+                ISScustomAPI.sendEvent("CAM", "1", "FACE_X_DATA", JSON.stringify({ "camName": json.data.name, params: params }));
             })
-            .catch((e) => {
-                confirm(e);
-            });
+            .catch(e=>{
+                confirm(e)
+            })
     } catch (e) {
         document.getElementById("test").innerHTML = e;
     }
+    
+	
+    /* OLD
+    var cam_id = document.getElementById("card_title").innerHTML;
+    var specificTdElement = document.querySelectorAll('[tabindex="' + cam_id + '"]');
+    var params = specificTdElement[0].querySelector("#params").textContent;
+
+    if(!params.includes("detection")) return
+
+    try {
+        ISScustomAPI.sendEvent("CAM", "1", "FACE_X_DATA", JSON.stringify({params: params}));
+    } catch (e) {
+        document.getElementById("test").innerHTML = e;
+    }*/
 }
 
 //Live Button
@@ -1305,8 +1577,10 @@ function formattedDateTime(date) {
 }
 ////////// end securOS section //////////////////////
 
+/*
 window.addEventListener("click", () => {
-    if (document.querySelector(".table-selected > #type").innerHTML != "FACE_X")
+    if (document.querySelector(".table-selected > #type").innerHTML != "FACEX")
         document.querySelector("#face_x_btn").setAttribute("hidden", "true");
     else document.querySelector("#face_x_btn").removeAttribute("hidden");
 });
+*/

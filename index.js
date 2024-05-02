@@ -8,10 +8,8 @@ var io = require("socket.io")(server);
 const configuration = require("./config");
 const http_modules = require("./js/pg");
 const message = require("./js/messages");
-const email = require("./js/mail");
 const restapi = require("./js/restapi");
 const integrationServer = require("./js/integrationserver");
-const csv = require("./js/csv");
 const logs = require("./js/logs/logs");
 const log_base_path = "Dispatch";
 
@@ -110,8 +108,6 @@ io.on("connection", function (socket) {
         logs.Write(`getCameras : ${res}`, "DEBUG", log_base_path);
         socket.emit("getCameras", res);
         message.select("events", 1000, function (res) {
-            //Send Events to html
-            //logs.Write(`events  1000 : ${res}`, "DEBUG", log_base_path);
             socket.emit("Events", res);
         });
     });

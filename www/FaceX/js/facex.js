@@ -1,5 +1,19 @@
+var recognition;
+
 ISScustomAPI.subscribe("CAM", "1", "FACE_X_INFO");
+
+// NEW
+ISScustomAPI.subscribe("CAM", "1", "CLEAR");
+//
+
 ISScustomAPI.onEvent((type, id, action, params) => {
+    // NEW
+    if (action == "CLEAR") {
+        recognition.innerHTML = ``;
+        return;
+    }
+    //
+
     window.document.getElementById("recognition-list").innerHTML = "";
     let addNewRecognition = "";
 
@@ -18,11 +32,15 @@ ISScustomAPI.onEvent((type, id, action, params) => {
     let personName = params2.person.first_name + " " + params2.person.middle_name + " " + params2.person.last_name;
     let timestamp = convertUTCDate(params2.timestamp);
 
-    if (priority == 0) { addNewRecognition = "recognition"; } 
-    else if (priority == 1) { addNewRecognition = "info-recognition"; } 
-    else { addNewRecognition = "white-recognition"; }
+    if (priority == 0) {
+        addNewRecognition = "recognition";
+    } else if (priority == 1) {
+        addNewRecognition = "info-recognition";
+    } else {
+        addNewRecognition = "white-recognition";
+    }
 
-    var recognition = document.createElement("div");
+    recognition = document.createElement("div");
     recognition.innerHTML = `
             <div class="${addNewRecognition}">
                 <div class="software-images">

@@ -19,6 +19,10 @@ var events = [
     },
     {
         type: "HTTP_EVENT_PROXY",
+    },
+    {
+        type: "LPR_CAM",
+        action: "CAR_LP_RECOGNIZED"
     }
 ];
 /////////////////////////////////////////////

@@ -8,7 +8,6 @@ const { triggerAsyncId } = require('async_hooks');
 var TreeArray =[];
 
 securos.connect( async function (core) {
-
     async function regularExpression(text, regexp){
         var re = new RegExp(regexp);
         var r  = text.match(re);

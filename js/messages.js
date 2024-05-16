@@ -60,12 +60,11 @@ function insert(table, json, callback) {
         }
     }
     insertQuery = insertQuery + ` )`;
- 
-        pg.query(insertQuery, function (res) {
-            console.log(insertQuery);
-            console.log("Inserting Field into table events...");
-            callback("Row inserted");
-        });
+    pg.query(insertQuery, function (res) {
+        console.log(insertQuery);
+        console.log("Inserting Field into table events...");
+        callback("Row inserted");
+    });
 }
 
 function update(id, table, json, callback) {

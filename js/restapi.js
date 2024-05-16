@@ -24,7 +24,7 @@ class restapi{
 	{
 		var username = this.user
 		var password = this.pass
-		var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+		var auth = 'Basic ' + new Buffer.from(username + ':' + password).toString('base64');
 		var url = `http://${this.ip}:${this.port}/${url}`
 		const options = {
 			url: url,

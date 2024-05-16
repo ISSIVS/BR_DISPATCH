@@ -11,7 +11,9 @@ const message = require("./js/messages");
 const restapi = require("./js/restapi");
 const integrationServer = require("./js/integrationserver");
 const logs = require("./js/logs/logs");
+const classificationJSON = require('./translations.json');
 const log_base_path = "Dispatch";
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,48 +51,50 @@ app.post("/securos", function (req, res) {
 
 //Register Events
 app.post("/events", function (req, res) {
-    //send to html
     try {
         if (req.body[0]) {
-            //console.log(req.body[0]);
-            logs.Write(`Event Received : ${req.body[0]}`, "DEBUG", log_base_path);
-            var type = req.body[0].type;
-            classification(req.body[0], function (res) {
-                //console.log("Classification Result", res)
-                logs.Write(`Classification Result : ${res}`, "DEBUG", log_base_path);
-                req.body[0].object_id = req.body[0].id;
-                req.body[0].state = "Novo";
-                req.body[0].params = JSON.stringify(req.body[0].params);
-                req.body[0].incident = req.body[0].incident || req.body[0].action;
-                delete req.body[0].id;
+            logs.Write(`Event Received : ${JSON.stringify(req.body[0])}`, "DEBUG", log_base_path);
 
-                getObject(req.body[0], function (res) {
-                    if (res) {
-                        logs.Write("Objet found in SecurOS DB ", "DEBUG", log_base_path);
-                        logs.Write("GetObject Result: " + JSON.stringify(res), "DEBUG", log_base_path);
-                        logs.Write("NAME: " + JSON.stringify(res.name), "DEBUG", log_base_path);
-                        req.body[0].name = res.name;
-                        req.body[0].priority = res.params != undefined ? res.params.tp_name : "Baixa";
-                        //req.body[0].cam_id = res.params != undefined ?  res.params.camera_id || res.id :"NOCAMID";
-                        logs.Write("body: " + JSON.stringify(req.body[0]), "DEBUG", log_base_path);
+            const type = req.body[0].type;
+            const action = req.body[0].action;
+            const incident = classifyEvent(req.body[0]) || req.body[0].action;
 
-                        message.insert("events", req.body[0], function () {
-                            //actualizo HTML5
-                            message.select("events", 10, function (res) {
-                                //envio a html las filas
-                                io.emit("newEvent", res);
-                            });
+            // console.log("Classification Result", incident);
+            // logs.Write(`Classification Result : ${incident}`, "DEBUG", log_base_path);
+
+            req.body[0].object_id = req.body[0].id;
+            req.body[0].state = "Novo";
+            req.body[0].params = JSON.stringify(req.body[0].params);
+            req.body[0].incident = incident || action;
+            delete req.body[0].id;
+
+            getObject(req.body[0], function (res) {
+                if (res) {
+                    logs.Write("Object found in SecurOS DB ", "DEBUG", log_base_path);
+                    logs.Write("GetObject Result: " + JSON.stringify(res), "DEBUG", log_base_path);
+                    logs.Write("NAME: " + JSON.stringify(res.name), "DEBUG", log_base_path);
+                    req.body[0].name = res.name;
+                    req.body[0].priority = res.params != undefined ? res.params.tp_name : "Baixa";
+
+                    logs.Write("body: " + JSON.stringify(req.body[0]), "DEBUG", log_base_path);
+
+                    // Insert event into the database
+                    message.insert("events", req.body[0], function () {
+                        // Fetch latest events
+                        message.select("events", 10, function (res) {
+                            // Emit new event to HTML
+                            io.emit("newEvent", res);
                         });
-                    } else {
-                        console.log("Object not found");
-                        logs.Write("Object not found", "ERROR", log_base_path + "_Events_not_found");
-                        logs.Write(
-                            "object_id:" + req.body[0].object_id + ", type:" + req.body[0].type + ", incident:" + req.body[0].incident,
-                            "ERROR",
-                            log_base_path + "_Events_not_found"
-                        );
-                    }
-                });
+                    });
+                } else {
+                    console.log("Object not found");
+                    logs.Write("Object not found", "ERROR", log_base_path + "_Events_not_found");
+                    logs.Write(
+                        "object_id:" + req.body[0].object_id + ", type:" + req.body[0].type + ", incident:" + req.body[0].incident,
+                        "ERROR",
+                        log_base_path + "_Events_not_found"
+                    );
+                }
             });
         }
     } catch (e) {
@@ -127,11 +131,6 @@ io.on("connection", function (socket) {
         } else match = match1;
 
         //console.log("match",match)
-        if (match) {
-            message.searchlike("directory", "panel", match[1], (rows) => {
-                socket.emit("abonado", rows);
-            });
-        }
     });
 
     socket.on("disconnect", () => {
@@ -326,60 +325,15 @@ function query(data, callback) {
     } else callback(null);
 }
 
-function classification(e, callback) {
-    try {
-        console.log(e.action);
-        //cameras
-        if (e.type == "CAM") {
-            if (e.action) {
-                switch (e.action) {
-                    case "MD_START":
-                        e.incident = "Detecção de movimento iniciou";
-                        break;
-                    case "MD_STOP":
-                        e.incident = "Detecção de movimento parou";
-                        break;
-                    case "ARMED":
-                        e.incident = "Câmera armada";
-                        break;
-                    case "DISARMED":
-                        e.incident = "Câmera desarmada";
-                        break;
-                    case "ATTACH":
-                        e.incident = "Câmera conectada";
-                        break;
-                    case "DETACH":
-                        e.incident = "Câmera desconectada";
-                        break;
-                    case "REC":
-                        e.incident = "Câmera gravando";
-                        break;
-                    case "REC_ERROR":
-                        e.incident = "Erro de gravação da câmera";
-                        break;
-                    case "REC_STOP":
-                        e.incident = "Câmera parou gravação";
-                        break;
-                    case "VCA_EVENT":
-                        console.log("Evento de analítico de vídeo--------", e.params.description);
-                        e.incident = e.params.description;
+function classifyEvent(e) {
+    const type = e.type || "default";
+    const action = e.action || "default";
 
-                        break;
-                    case "PEDRO":
-                        console.log("Evento do Pedro");
-                        e.incident = e.params.description;
-                        break;
-                    default:
-                        e.incident = "Camera event";
-                        break;
-                }
-            }
-        }
-        //SENSORS
-        else {
-            e.incident = e.params.comment;
-        }
-
-        callback(e);
-    } catch (e) {}
+    if (classificationJSON[type] && classificationJSON[type][action]) {
+        return classificationJSON[type][action];
+    } else if (classificationJSON[type] && classificationJSON[type]["default"]) {
+        return classificationJSON[type]["default"];
+    } else {
+        return classificationJSON["default"]["comment"];
+    }
 }

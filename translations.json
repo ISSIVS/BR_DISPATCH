@@ -1,0 +1,32 @@
+{
+    "CAM": {
+        "MD_START": "Detecção de movimento iniciou",
+        "MD_STOP": "Detecção de movimento parou",
+        "ARMED": "Câmera armada",
+        "DISARMED": "Câmera desarmada",
+        "ATTACH": "Câmera conectada",
+        "DETACH": "Câmera desconectada",
+        "REC": "Câmera gravando",
+        "REC_ERROR": "Erro de gravação da câmera",
+        "REC_STOP": "Câmera parou gravação",
+        "VCA_EVENT": {
+            "description": "Evento de analítico de vídeo"
+        },
+        "default": "Camera event"
+    },
+    "LPR_CAM": {
+        "CAR_LP_RECOGNIZED": "Placa de veículo reconhecida",
+        "default": "LPR event"
+    },
+    "FACE_X_SERVER": {
+        "MATCH": "Face reconhecida",
+        "DETECTION": "Face detectada",
+        "default": "FaceX event"
+    },
+    "HTTP_EVENT_PROXY": {
+        "RECEIVED":""
+    },
+    "default": {
+        "comment": null
+    }
+}

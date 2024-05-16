@@ -1,7 +1,7 @@
 const http = require("http");
 fs = require("fs");
 const request = require("request");
-const config = require("./js/config");
+const config = require("./config");
 
 var username = config.restapi_user;
 var password = config.restapi_pass;
@@ -11,7 +11,6 @@ var password = config.restapi_pass;
 var events = [
     {
      	type: "CAM",
-        action: "VCA_EVENT"
     },
     {
         type: "FACE_X_SERVER",
@@ -45,7 +44,7 @@ request.get(options, (err, res, body) => {
     var json = JSON.parse(body);
     if (json.data.length > 0) {
         for (var p in json.data) {
-            if (json.data[p].callback == `http://${config.ip}:${config.serverPort}/events`) {
+            if (json.data[p].callback == `http://${config.ip}:3500/events`) {
                 deleteEvents(json.data[p].id);
                 console.log("deleting...", json.data[p].id);
             }

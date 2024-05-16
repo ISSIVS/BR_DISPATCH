@@ -13,6 +13,7 @@ var cameras;
 var coordinates = [];
 let alertMessage = new AlertMessage();
 var startDateFilter, endDateFilter;
+var watchlistLPR = {};
 
 var socket = io();
 socket.on("newEvent", function (msg) {
@@ -25,10 +26,7 @@ socket.on("Events", function (msg) {
     console.log("receiving event :", msg);
     buildTable(msg);
 });
-socket.on("directory", function (msg) {
-    //console.log('receiving directory')
-    buildNames(msg);
-});
+
 socket.on("getCameras", async function (msg) {
     //console.log('receiving cameras')
     // await buildCameras(msg)
@@ -179,10 +177,10 @@ function addToTable(json) {
                 json[i].camera_id = params.cam_id;
                 json[i].name = params.person.first_name + " " + params.person.last_name;
                 json[i].comment = params.person.notes;
-                json[i].incident = "Face reconhecida";
 
                 //console.log(params)
             }
+
             if (json[i].type == "CAM") {
                 json[i].camera_id = json[i].object_id;
             }
@@ -191,25 +189,25 @@ function addToTable(json) {
                 json[i].type = "FACEX";
             }
 
-            /* if (json[i].type == "HTTP_EVENT_PROXY") {
+            if (json[i].type == "HTTP_EVENT_PROXY") {
                 json[i].type = "EVENT_GATE";
-                json[i].incident = "Instrusão detectada";
+                // json[i].incident = "Instrusão detectada";
                 try {
                     json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
                 } catch (e) {
                     json[i].camera_id = json[i].cam_id;
                 }
-            } */
+            }
 
             if (json[i].action == "VCA_EVENT") {
-                json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+                try {
+                    json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+                } catch (e) {
+                    console.error(e);
+                }
             }
 
-            if (json[i].action == "CAR_LP_RECOGNIZED") {
-                json[i].name = JSON.parse(json[i].params).number;
-                json[i].object_id = JSON.parse(json[i].params).camera_id;
-                json[i].incident = "Placa reconhecida";
-            }
+            // MODIFY UPCOMING EVENTS INFO HERE (e.g., type, camId, comment, etc.)
 
             if (json[i].priority == "undefined") {
                 json[i].priority = "";
@@ -304,7 +302,6 @@ function buildTable(json) {
             json[i].camera_id = params.cam_id;
             json[i].name = params.person.first_name + " " + params.person.last_name;
             json[i].comment = params.person.notes;
-            json[i].incident = "Face reconhecida";
 
             //console.log(params)
         }
@@ -316,25 +313,25 @@ function buildTable(json) {
             json[i].type = "FACEX";
         }
 
-        /* if (json[i].type == "HTTP_EVENT_PROXY") {
+        if (json[i].type == "HTTP_EVENT_PROXY") {
             json[i].type = "EVENT_GATE";
-            json[i].incident = "Instrusão detectada";
+            // json[i].incident = "Instrusão detectada";
             try {
                 json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
             } catch (e) {
                 json[i].camera_id = json[i].cam_id;
             }
-        } */
+        }
 
         if (json[i].action == "VCA_EVENT") {
-            json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
-        }
+            try {
+                json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
+            } catch (e) {
+                console.error(e);
+            }
+        } 
 
-        if (json[i].action == "CAR_LP_RECOGNIZED") {
-            json[i].name = JSON.parse(json[i].params).number;
-            json[i].object_id = JSON.parse(json[i].params).camera_id;
-            json[i].incident = "Placa reconhecida";
-        }
+        // MODIFY OLD EVENTS INFO HERE (e.g., type, camId, comment, etc.) 
 
         if (json[i].priority == "undefined") {
             json[i].priority = "";
@@ -925,40 +922,6 @@ function filter() {
     }
 }
 
-//keyboard shortcuts
-document.querySelector("#table").addEventListener(
-    "keydown",
-    function (event) {
-        console.log(event);
-        event.stopPropagation();
-        if (!event.repeat) {
-            //--- Was a Shift-Q combo pressed?
-            if (event.shiftKey && (event.key === "q" || event.key === "Q")) {
-                // case sensitive
-                //state('Em Tratamento');
-            }
-            //--- Was a Shift-W combo pressed?
-            if (event.shiftKey && (event.key === "w" || event.key === "W")) {
-                // case sensitive
-                state("");
-                handled = false;
-                return false;
-            }
-            //--- Was a Shift-E combo pressed?
-            if (event.shiftKey && (event.key === "e" || event.key === "E")) {
-                // case sensitive
-                //state('Encerrado');
-            }
-            //--- Was a Shift-E combo pressed?
-            if (event.shiftKey && (event.key === "f" || event.key === "F")) {
-                // case sensitive
-                //state('Falha de Sistema');
-            }
-        }
-    },
-    true
-);
-
 function newMessage(e) {
     e.preventDefault();
 }
@@ -1142,43 +1105,6 @@ function play() {
     }
 }
 
-// FaceX Function
-// New
-window.addEventListener("click", () => {
-    if (document.querySelector(".table-selected > #type").innerHTML != "FACEX") {
-        try {
-            ISScustomAPI.sendEvent("CAM", "1", "CLEAR");
-        } catch (e) {
-            document.getElementById("test").innerHTML = e;
-        }
-    } else {
-        const ip_address = "localhost";
-        const rest_api_port = "8888";
-        const auth = { Authorization: `Basic ${btoa("Admin:123")}` };
-
-        var params = document.querySelector(".table-selected > #params").textContent;
-
-        if (!params.includes("detection")) return;
-
-        var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
-
-        try {
-            fetch(`http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId}`, { method: "GET", headers: auth })
-                .then((response) => response.json())
-                .then((json) => {
-                    ISScustomAPI.sendEvent("CAM", "1", "FACE_X_INFO", JSON.stringify({ cam_name: json.data.name, params: params }));
-                })
-                .catch((e) => {
-                    document.getElementById("test").innerHTML = e;
-                    console.log(e);
-                });
-        } catch (e) {
-            document.getElementById("test").innerHTML = e;
-        }
-    }
-});
-//
-
 //Live Button
 function live() {
     var cam_id = document.getElementById("card_title").innerHTML;
@@ -1206,6 +1132,7 @@ function live() {
         document.getElementById("test").innerHTML = e;
     }
 }
+
 //Dates funtions
 function dateToDDMMYY(date) {
     var d = date.getDate();

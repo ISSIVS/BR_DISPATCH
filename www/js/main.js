@@ -58,35 +58,6 @@ function incidents() {
     inc.classList.remove("hidden");
 }
 
-async function thread(json, callback) {
-    var table = "";
-
-    for (var i = 0; i < json.length; i++) {
-        table += '<tr class="table-row clickable-row " >';
-        table += '<th hidden="true" scope="row" id="id">' + json[i].id + "</th>";
-        table += '<td id="camera_id" >' + json[i].camera_id + "</td>";
-        table += '<td id="incident" >' + json[i].incident + "</td>";
-        table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options) + "</td>";
-        table += '<td id="state">' + json[i].state || "" + "</td>";
-        table += '<td id="operator">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td width="100px" id="responsetime"></td>';
-        else table += '<td width="100px" id="responsetime">' + new Date(json[i].response_time).toLocaleString("pt-br", options2) + "</td>";
-        if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"></td>';
-        else
-            table +=
-                '<td width="100px" id="resolution_time">' +
-                new Date(json[i].resolution_time).toLocaleDateString("pt-br", options2) +
-                "</td>";
-        table += '<td hidden="true" id="comment">' + json[i].comment + "</td>";
-        table += '<td hidden="true" id="action">' + json[i].action + "</td>";
-        table += '<td hidden="true" id="priority">' + json[i].priority + "</td>";
-        table += '<td hidden="true" id="procedure">' + json[i].procedure + "</td>";
-        table += "</tr>";
-        progression = (100 * i) / json.length;
-    }
-    callback(table);
-}
-
 var tabindex = undefined;
 
 function btnProcedure(event) {
@@ -153,7 +124,7 @@ function addToTable(json) {
             table +=
                 '<td id="tdcheck_' +
                 json[i].id +
-                '" width="50px"><input type="checkbox" id="check_' +
+                '" ><input type="checkbox" id="check_' +
                 json[i].id +
                 '" name="' +
                 json[i].object_id +
@@ -211,37 +182,37 @@ function addToTable(json) {
 
             if (json[i].priority == "undefined") {
                 json[i].priority = "";
-                table += '<td id="priority" hidden="true" class="to_hide"  width="50px" value=""></td>';
+                table += '<td id="priority" hidden="true" class="to_hide"   value=""></td>';
             } else {
                 if (json[i].priority == "Alta")
                     table +=
-                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
+                        '<td id="priority" hidden="true" class="to_hide"   value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
                 else if (json[i].priority == "Média")
                     table +=
-                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
+                        '<td id="priority" hidden="true" class="to_hide"   value="Média"><i class="fa fa-exclamation-circle"></i></td>';
                 else
                     table +=
-                        '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
+                        '<td id="priority" hidden="true" class="to_hide"   value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
             }
-            if (json[i].type == "GENERIC_USER") table += '<td id="type" width="100px" >' + "USER" + "</td>";
-            else table += '<td id="type" width="100px" >' + json[i].type + "</td>";
+            if (json[i].type == "GENERIC_USER") table += '<td id="type" >' + "USER" + "</td>";
+            else table += '<td id="type" >' + json[i].type + "</td>";
 
-            table += '<td id="object_id" width="70px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
-            table += '<td id="name" width="20%">' + json[i].name + "</td>";
-            table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
-            table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
-            table += '<td id="state"  width="125em"  class="to_hide">' + json[i].state || "" + "</td>";
-            table += '<td id="operator"  width="100em" class="to_hide">' + json[i].operator + "</td>";
-            if (json[i].response_time == null) table += '<td width="100px" id="responsetime"  class="to_hide"></td>';
+            table += '<td id="object_id" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
+            table += '<td id="name" >' + json[i].name + "</td>";
+            table += '<td id="incident"  >' + json[i].incident + "</td>";
+            table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
+            table += '<td id="state"   class="to_hide">' + json[i].state || "" + "</td>";
+            table += '<td id="operator"  class="to_hide">' + json[i].operator + "</td>";
+            if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
             else
                 table +=
-                    '<td width="100px" id="responsetime"  class="to_hide">' +
+                    '<td id="responsetime"  class="to_hide">' +
                     new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) +
                     "</td>";
-            if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"  class="to_hide"></td>';
+            if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
             else
                 table +=
-                    '<td width="100px" id="resolution_time"  class="to_hide">' +
+                    '<td id="resolution_time"  class="to_hide">' +
                     new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
                     "</td>";
             table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
@@ -278,7 +249,7 @@ function buildTable(json) {
         table +=
             '<td id="tdcheck_' +
             json[i].id +
-            '" width="50px" ><input type="checkbox" id="check_' +
+            '"  ><input type="checkbox" id="check_' +
             json[i].id +
             '" name="' +
             json[i].object_id +
@@ -329,43 +300,39 @@ function buildTable(json) {
             } catch (e) {
                 console.error(e);
             }
-        } 
+        }
 
-        // MODIFY OLD EVENTS INFO HERE (e.g., type, camId, comment, etc.) 
+        // MODIFY OLD EVENTS INFO HERE (e.g., type, camId, comment, etc.)
 
         if (json[i].priority == "undefined") {
             json[i].priority = "";
-            table += '<td id="priority" hidden="true" class="to_hide"  width="50px" value=""></td>';
+            table += '<td id="priority" hidden="true" class="to_hide"   value=""></td>';
         } else {
             if (json[i].priority == "Alta")
-                table +=
-                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
+                table += '<td id="priority" hidden="true" class="to_hide"   value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
             else if (json[i].priority == "Média")
-                table +=
-                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Média"><i class="fa fa-exclamation-circle"></i></td>';
+                table += '<td id="priority" hidden="true" class="to_hide"   value="Média"><i class="fa fa-exclamation-circle"></i></td>';
             else
                 table +=
-                    '<td id="priority" hidden="true" class="to_hide"  width="50px" value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
+                    '<td id="priority" hidden="true" class="to_hide"   value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
         }
-        if (json[i].type == "GENERIC_USER") table += '<td id="type" width="100px" >' + "USER" + "</td>";
-        else table += '<td id="type" width="100px" >' + json[i].type + "</td>";
+        if (json[i].type == "GENERIC_USER") table += '<td id="type" >' + "USER" + "</td>";
+        else table += '<td id="type" >' + json[i].type + "</td>";
 
-        table += '<td id="object_id" width="70px" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
-        table += '<td id="name" width="20%">' + json[i].name + "</td>";
-        table += '<td id="incident" width="20%" >' + json[i].incident + "</td>";
-        table += '<td id="time" width="210px">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
-        table += '<td id="state"  width="125em"  class="to_hide">' + json[i].state || "" + "</td>";
-        table += '<td id="operator"  width="100em" class="to_hide">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td width="100px" id="responsetime"  class="to_hide"></td>';
+        table += '<td id="object_id" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
+        table += '<td id="name" >' + json[i].name + "</td>";
+        table += '<td id="incident"  >' + json[i].incident + "</td>";
+        table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
+        table += '<td id="state"   class="to_hide">' + json[i].state || "" + "</td>";
+        table += '<td id="operator"  class="to_hide">' + json[i].operator + "</td>";
+        if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
         else
             table +=
-                '<td width="100px" id="responsetime"  class="to_hide">' +
-                new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) +
-                "</td>";
-        if (json[i].resolution_time == null) table += '<td width="100px" id="resolution_time"  class="to_hide"></td>';
+                '<td id="responsetime"  class="to_hide">' + new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) + "</td>";
+        if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
         else
             table +=
-                '<td width="100px" id="resolution_time"  class="to_hide">' +
+                '<td id="resolution_time"  class="to_hide">' +
                 new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
                 "</td>";
         table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
@@ -677,7 +644,7 @@ function state(value) {
 
     switch (value) {
         case "Em Tratamento":
-            if (["Solucionado", "Falha de Sistema", "Novo", "Reconhecido", "Alarme"].includes(currentState)) {
+            if (["Em Tratamento", "Solucionado", "Falha de Sistema", "Novo", "Reconhecido", "Alarme"].includes(currentState)) {
                 json.comment = "Evento em tratamento: " + json.comment;
                 json.response_time = localtimeString;
                 break;
@@ -847,6 +814,7 @@ function filter() {
         var f4 = true;
         var td1, td2, td3, td4, td5;
         activeIncidents = 0;
+        limitRows = 1010
         table = document.getElementById("table");
         tr = table.getElementsByTagName("tr");
 
@@ -915,6 +883,11 @@ function filter() {
         }
 
         active = document.getElementById("activeIncidents");
+
+        // LIMIT ROWS
+        limitRows - tr.length < 0 ? [...document.querySelectorAll("tr")].pop().remove() : null;
+
+
         active.innerHTML =
             '<i class="fa fa-exclamation-triangle triangle" aria-hidden="true"></i> ' + activeIncidents + " Incidentes Ativos";
     } catch (e) {
@@ -1024,7 +997,7 @@ document.querySelector("[data-field=response_time]").addEventListener("mouseover
     const eventosString = checkedEvents === 1 ? "evento" : "eventos";
     const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ficar${
         checkedEvents === 1 ? "á" : "ão"
-    } em progresso`;
+    } em tratamento`;
 
     document.querySelector("#check1 > title").textContent = texto;
 });
@@ -1034,7 +1007,7 @@ document.querySelector("[data-field=resolution_time]").addEventListener("mouseov
     const eventosString = checkedEvents === 1 ? "evento" : "eventos";
     const texto = `${checkedEvents} ${eventosString} selecionado${checkedEvents === 1 ? "" : "s"} ser${
         checkedEvents === 1 ? "á" : "ão"
-    } resolvido${checkedEvents === 1 ? "" : "s"}`;
+    } solucionado${checkedEvents === 1 ? "" : "s"}`;
 
     document.querySelector("#check2 > title").textContent = texto;
 });

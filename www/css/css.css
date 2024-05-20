@@ -12,26 +12,26 @@ h5 {
 
 
 .fa-exclamation-triangle {
-  font-size: 25px;
+  font-size: 1.5625em;
   color: rgb(255, 0, 0);
 }
 
 .fa-exclamation-circle {
-  font-size: 25px;
+  font-size: 1.5625em;
   color: rgb(255, 230, 1);
 }
 
 .fa-info-circle {
-  font-size: 25px;
+  font-size: 1.5625em;
   color: rgb(1, 103, 255);
 }
 
 .table {
-  margin-top: 20px;
+  margin-top: 1.25em;
   background: #2C3347;
   color: #fff;
   border-top: 0;
-  font-size: 12px;
+  font-size: 0.75em;
 }
 
 .table td,
@@ -45,7 +45,7 @@ h5 {
 }
 
 .table-incidents table {
-  margin-right: 10px
+  margin-right: 0.625em
 }
 
 .table-incidents tbody {
@@ -59,7 +59,7 @@ h5 {
   display: block;
   height: 45vh;
   overflow: auto;
-  margin-right: 10px;
+  margin-right: 0.625em;
 
 }
 
@@ -97,12 +97,12 @@ h5 {
 }
 
 .incident-item {
-  padding: 3px;
+  padding: 0.1875em;
 }
 
 .row {
-  margin-right: 0px;
-  margin-left: 0px;
+  margin-right: 0em;
+  margin-left: 0em;
   flex-wrap: wrap;
 }
 
@@ -112,13 +112,11 @@ h5 {
 
 .card {
   background: #2C3347;
-  margin-top: 20px;
-  margin-right: 10px;
+  margin-top: 1.25em;
+  margin-right: 0.625em;
   color: #fff;
-  padding: 10px;
-  font-size: 12px;
-  
-
+  padding: 0.625em;
+  font-size: 0.75em;
 }
 
 .card-play {
@@ -127,10 +125,10 @@ h5 {
   background-image: -webkit-gradient(linear, left top, right top, color-stop(69%, #fff), color-stop(100%, #0f49581a));
   background-image: -webkit-linear-gradient(left, #12841F 0%, #00F91C 100%);
   -webkit-text-fill-color: transparent;
-  margin-top: 2px;
-  left: 10px;
-  font-size: 20px;
-  text-shadow: 5px 5px #558ABB;
+  margin-top: 0.125em;
+  left: 0.625em;
+  font-size: 1.25em;
+  text-shadow: 0.3125em 0.3125em #558ABB;
 }
 
 body {
@@ -153,7 +151,7 @@ body {
 }
 
 .-btn {
-  margin-left: 5px;
+  margin-left: 0.3125em;
 }
 
 .play{
@@ -161,11 +159,11 @@ body {
 }
 
 .directory {
-  padding-top: 20px
+  padding-top: 1.25em
 }
 
 .directory .reports {
-  padding-top: 20px
+  padding-top: 1.25em
 }
 
 
@@ -175,7 +173,7 @@ body {
 
 .glyphicon {
   position: relative;
-  top: 1px;
+  top: 0.0625em;
   display: inline-block;
   font-family: 'Glyphicons Halflings';
   font-style: normal;
@@ -186,25 +184,25 @@ body {
 }
 
 .time {
-  margin-left: 20px;
+  margin-left: 1.25em;
 }
 
 .box-title {
   color: #fff;
-  margin-top: 20px;
-  font-size: 17px;
-  margin-left: 15px;
+  margin-top: 1.25em;
+  font-size: 1.0625em;
+  margin-left: 0.9375em;
 }
 
 .box-label {
   color: #fff;
-  margin-top: 20px;
-  font-size: 12px;
-  margin-left: 0px;
+  margin-top: 1.25em;
+  font-size: 0.75em;
+  margin-left: 0em;
 }
 
 .search-btn {
-  margin-top: 10px;
+  margin-top: 0.625em;
 }
 
 .dropdown:hover .dropdown-menu {
@@ -213,7 +211,7 @@ body {
 }
 
 .navbar-text {
-  margin-right: 20px;
+  margin-right: 1.25em;
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -224,13 +222,13 @@ body {
   align-items: center;
   color: rgba(233, 236, 237, 0.78);
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 1.875em;
+  height: 1.875em;
   display: inline-flex;
-  font-size: 16px;
-  padding: 10px;
+  font-size: 1em;
+  padding: 0.625em;
   vertical-align: middle;
-  margin: 0 10px 0 0;
+  margin: 0 0.625em 0 0;
 }
 
 
@@ -238,7 +236,7 @@ body {
   display: block;
   height: 50vh;
   overflow: auto;
-  margin-right: 10px
+  margin-right: 0.625em
 }
 
 .table-reports thead,
@@ -251,11 +249,11 @@ body {
 }
 
 .filters {
-  padding-top: 20px;
+  padding-top: 1.25em;
 }
 
 .activeIncidents {
-  margin-right: 50px;
+  margin-right: 3.125em;
   color: rgba(255, 255, 255, 1);
 }
 
@@ -301,11 +299,11 @@ body {
 }
 
 .bootstrap-select .dropdown-toggle .filter-option {
-  padding-top: 2px;
+  padding-top: 0.125em;
 }
 
 .select {
-  padding-top: 1px;
+  padding-top: 0.0625em;
 }
 
 .btn-sm {
@@ -320,14 +318,14 @@ body {
 
 .select2-container .select2-selection--single {
 
-  height: 36px;
+  height: 2.25em;
 
 }
 
 section {
   width: 100%;
   height: 100%;
-  margin: 50px;
+  margin: 3.125em;
 }
 
 #overlay {
@@ -346,27 +344,27 @@ section {
 }
 
 .spin-big {
-  font-size: 50px;
-  height: 50px;
-  width: 50px;
-  margin-top: -25px;
-  margin-left: -25px;
+  font-size: 3.125em;
+  height: 3.125em;
+  width: 3.125em;
+  margin-top: -1.5625em;
+  margin-left: -1.5625em;
 }
 
 .spin-normal {
-  font-size: 35px;
-  height: 35px;
-  width: 35px;
-  margin-top: -22.5px;
-  margin-left: -22.5px;
+  font-size: 2.1875em;
+  height: 2.1875em;
+  width: 2.1875em;
+  margin-top: -22.0.3125em;
+  margin-left: -22.0.3125em;
 }
 
 .spin-small {
-  font-size: 20px;
-  height: 20px;
-  width: 20px;
-  margin-top: -10px;
-  margin-left: -10px;
+  font-size: 1.25em;
+  height: 1.25em;
+  width: 1.25em;
+  margin-top: -0.625em;
+  margin-left: -0.625em;
 }
 
 .backReport {
@@ -376,17 +374,17 @@ section {
 
 .user_img {
 
-  height: 20px;
-  width: 20px;
-  border-radius: 45px;
+  height: 1.25em;
+  width: 1.25em;
+  border-radius: 2.8125em;
 
-  box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
+  box-shadow: 0 0.125em 0.3125em rgb(0 0 0 / 10%);
 }
 
 .fa_header {
   color: ghostwhite;
   text-align: center;
-  font-size: 20px;
+  font-size: 1.25em;
 }
 
 th {
@@ -402,7 +400,7 @@ th {
 .form-message {
   display: block;
   width: 100%;
-  height: calc(1.5em + 0.75rem + 2px);
+  height: calc(1.5em + 0.75rem + 0.125em);
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   font-weight: 400;
@@ -410,14 +408,14 @@ th {
   color: #495057;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #ced4da;
+  border: 0.0625em solid #ced4da;
   border-radius: 0.25rem;
   transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 .form-send {
   display: block;
-  width: 50px;
-  height: calc(1.5em + 0.75rem + 2px);
+  width: 3.125em;
+  height: calc(1.5em + 0.75rem + 0.125em);
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   font-weight: 400;
@@ -431,7 +429,7 @@ th {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 0.625em;
 }
 
 /* Track */
@@ -450,7 +448,7 @@ th {
 }
 
 .incidents {
-  height: 388px;
+  height: 24.25em;
 }
 
 .icono-clickeable {
@@ -467,17 +465,17 @@ th {
 
 .icono-boton {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 0.375em 0.75em;
   margin-bottom: 0;
-  font-size: 14px;
+  font-size: 0.875em;
   font-weight: normal;
   line-height: 1.42857143;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
   cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 0.0625em solid #ccc;
+  border-radius: 0.25em;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -489,4 +487,50 @@ th {
 .icono-boton:hover {
   background-color: #aaa; /* color al pasar el mouse por encima */
   color:#fff;
+}
+
+/* NEW STYLE */
+
+.table tr:nth-child(even) {
+  background-color: #353d55;
+}
+.table td {
+  padding: 0.3125em;
+  text-align: center;
+  border: 1px rgb(11, 8, 43) solid;
+  word-wrap: break-word;
+}
+.table th {
+  padding: 0.75rem;
+}
+
+ thead [data-field*="selection"], tbody td[id*="tdcheck"]{
+  width: 35px;
+}
+thead [data-field*="object"], tbody td[id*="type"]{
+  width: 90px;
+}
+thead [data-field*="id_obj"], tbody td[id*="object_id"]{
+  width: 80px;
+}
+thead [data-field*="name"], tbody td[id*="name"]{
+  width: 200px; 
+}
+thead [data-field*="event"], tbody td[id*="incident"]{
+  width: 200px;
+}
+thead [data-field*="time"], tbody td[id*="time"]{
+  width: 150px;
+} 
+thead [data-field*="state"], tbody td[id*="state"]{
+  width: 140px;
+}
+thead [data-field*="operator"], tbody td[id*="operator"]{
+  width: 150px;
+}
+thead [data-field*="response_time"], tbody td[id*="responsetime"]{
+  width: 100px
+}
+thead [data-field*="resolution_time"], tbody td[id*="resolution_time"]{
+  width: 100px
 }

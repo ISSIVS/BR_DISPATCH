@@ -1,7 +1,9 @@
+<!DOCTYPE html>
+
 <html>
     <head>
         <meta charset="utf-8" />
-
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
         <script src="socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
         <link href="css/datepicker.css" rel="stylesheet" type="text/css" />
@@ -17,27 +19,14 @@
         <script type="text/javascript" src="js/ajax_libs_pdfmake_0.1.53_vfs_fonts.js"></script>
         <link rel="icon" href="images/logos securOS__S.png" type="image/x-icon" />
         <title>SecurOS - GEA</title>
-        <style>
-            .table tr:nth-child(even) {
-                background-color: #353d55;
-            }
-            .table td {
-                padding: 5px;
-                text-align: center;
-                border: 1px rgb(11, 8, 43) solid;
-                word-wrap: break-word;
-            }
-            .table th {
-                padding: 0.75rem;
-            }
-        </style>
+        <style></style>
     </head>
 
     <body>
         <!-- navbar SecurOS-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-securos">
             <a class="navbar-brand" href="#">
-                <img src="images/logos securOS__S.png" width="30" height="30" alt="" />
+                <img src="images/logos securOS__S.png" height="30" alt="" />
             </a>
             <button
                 class="navbar-toggler"
@@ -115,39 +104,39 @@
             </div>
 
             <!-- main table -->
-            <div class="col-md-12" id="tablediv">
-                <table id="table" class="table table-incidents table-hover tablediv table-condensed table-dark table-responsive-md">
+            <div class="col-md-12 table-responsive" id="tablediv">
+                <table id="table" class="table table-incidents table-hover tablediv table-condensed table-dark">
                     <thead>
                         <tr class="clickable-row">
                             <th hidden="true" data-field="id"></th>
-                            <th data-field="selection" width="50px">
+                            <th data-field="selection">
                                 <i
                                     id="seleccionarTodos"
                                     class="fa fa-check-square fa_header icono-clickeable"
                                     onclick="seleccionarTodos()"
                                 ></i>
                             </th>
-                            <th hidden="true" data-field="priority" width="50px" class="to_hide">
+                            <th hidden="true" data-field="priority" class="to_hide">
                                 <i class="fa fa-info-circle fa_header" aria-hidden="true"></i>
                             </th>
-                            <th data-field="object" class="to_hide" width="100px">Objeto</th>
-                            <th data-field="id_obj" width="70px">ID</th>
-                            <th data-field="name" width="20%">Nome</th>
-                            <th data-field="event" width="20%">Evento</th>
-                            <th data-field="time" width="210px">
+                            <th data-field="object" class="to_hide">Objeto</th>
+                            <th data-field="id_obj">ID</th>
+                            <th data-field="name">Nome</th>
+                            <th data-field="event">Evento</th>
+                            <th data-field="time">
                                 <span style="opacity: 0; position: absolute">Data-Hora</span>
                                 <i class="fa fa-clock fa_header" aria-hidden="true"></i>
                             </th>
-                            <th data-field="state" class="to_hide" width="125em">Estado</th>
-                            <th data-field="operator" class="to_hide" width="100em">
+                            <th data-field="state" class="to_hide">Estado</th>
+                            <th data-field="operator" class="to_hide">
                                 <span style="opacity: 0; position: absolute">Operador</span>
                                 <i class="fa fa-user fa_header" aria-hidden="true"></i>
                             </th>
-                            <th data-field="response_time" class="to_hide" width="100px">
+                            <th data-field="response_time" class="to_hide">
                                 <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resposta</span>
                                 <i title="1" id="check1" class="fa-solid fa-check fa_header icono-boton" onclick="check1()"></i>
                             </th>
-                            <th data-field="resolution_time" class="to_hide" width="100px">
+                            <th data-field="resolution_time" class="to_hide">
                                 <span style="opacity: 0; position: absolute; font-size: 0">Hora de Resolução</span>
                                 <i title="2" id="check2" class="fa-solid fa_header fa-check-double icono-boton" onclick="check2()"></i>
                             </th>
@@ -160,11 +149,8 @@
                     </thead>
                     <tbody id="rows"></tbody>
                 </table>
-                <div>
-                    <button class="btn btn-danger" id="pdf">Exportar para PDF</button>
-                    <button class="btn btn-success" id="csv">Exportar para CSV</button>
-                </div>
             </div>
+
             <!-- Details  -->
             <div class="col-md-4 hidden" id="incidentCard">
                 <div class="card" id="incidentCards">
@@ -263,7 +249,12 @@
                 </div>
                 <div id="contactCard"></div>
             </div>
+            <div class="col-md-12">
+                <button class="btn btn-danger" id="pdf">Exportar para PDF</button>
+                <button class="btn btn-success" id="csv">Exportar para CSV</button>
+            </div>
         </div>
+
         <!-- END INCIDENTS TAB-->
 
         <div id="progress">

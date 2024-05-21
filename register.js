@@ -44,7 +44,7 @@ request.get(options, (err, res, body) => {
     var json = JSON.parse(body);
     if (json.data.length > 0) {
         for (var p in json.data) {
-            if (json.data[p].callback == `http://${config.ip}:3500/events`) {
+            if (json.data[p].callback == `http://${config.ip}:8333/events`) {
                 deleteEvents(json.data[p].id);
                 console.log("deleting...", json.data[p].id);
             }

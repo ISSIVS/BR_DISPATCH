@@ -1,6 +1,6 @@
 set mypath= "%cd%
 cd %mypath%
-cd Dispatch 2.3
+cd BR_GEA
 call create_db.bat
 SET F="deamon"
 IF EXIST %F% RMDIR  %F%

@@ -105,6 +105,21 @@ function select(table, limit, callback) {
         callback(res.rows);
     });
 }
+
+function select_filter(table, dates, callback) {
+  var startDate = new Date(dates.start);
+  var endDate = new Date(dates.end);
+
+  var formattedStartDate = startDate.toISOString();
+  var formattedEndDate = endDate.toISOString();
+  
+  var SelectQuery = `SELECT * FROM ${table} WHERE time BETWEEN '${formattedStartDate}' AND '${formattedEndDate}' ORDER BY id DESC`;
+
+  pg.query(SelectQuery, function (res) {
+      callback(res.rows);
+  });
+}
+
 function search(table, id, callback) {
     var SelectQuery = `SELECT * FROM ${table} WHERE id = ${id}`;
 
@@ -163,6 +178,7 @@ function query(query, callback) {
 exports.message = message;
 exports.insert = insert;
 exports.select = select;
+exports.select_filter = select_filter;
 exports.update = update;
 exports.search = search;
 exports.searchlike = searchlike;

@@ -27,17 +27,6 @@ socket.on("Events", function (msg) {
     buildTable(msg);
 });
 
-socket.on("getCameras", async function (msg) {
-    //console.log('receiving cameras')
-    // await buildCameras(msg)
-});
-socket.on("queryResult", function (msg) {
-    //console.log('receiving report')
-    //console.log(msg)
-
-    buildReport(msg, function (msg) {});
-});
-
 document.addEventListener(
     "focus",
     function (event) {
@@ -59,34 +48,6 @@ function incidents() {
 }
 
 var tabindex = undefined;
-
-function btnProcedure(event) {
-    console.log("btnProcedure");
-    var action = event.currentTarget.innerHTML;
-    switch (action) {
-        case "Começou a monitorar o incidente":
-            procedure("Começou a monitorar o incidente");
-            break;
-        case "Parou de monitorar o incidente":
-            procedure("Parou de monitorar o incidente");
-            break;
-        case "Problema encaminhado ao supervisor":
-            procedure("Problema encaminhado ao supervisor");
-            break;
-        case "Chamado para a equipe de segurança local":
-            procedure("Chamado para a equipe de segurança local");
-            break;
-        case "Chamado pessoal de segurança de monitoramento central":
-            procedure("Chamado pessoal de segurança de monitoramento central");
-            break;
-        case "Chamado 190":
-            procedure("Chamado 190");
-            break;
-        case "Chamado para a manutenção para analisar o problema relacionado à câmera":
-            procedure("Chamado para a manutenção para analisar o problema relacionado à câmera");
-            break;
-    }
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////TABLA INCIDENTES/////////////////////////////////////
@@ -111,15 +72,7 @@ function addToTable(json) {
         if (elementoEncontrado == -1) {
             var table = "";
 
-            var givenDateTime = moment(document.querySelector("#datetimepicker").value.split("-")[1].trim(), "DD/MM/YYYY HH:mm:ss");
-            var currentDateTime = moment();
-            var isBeforeCurrentDateTime = givenDateTime.isBefore(currentDateTime);
-            var tableRowHtml = '<tr class="table-row clickable-row" tabindex="' + json[i].id + '"';
-            if (isBeforeCurrentDateTime) {
-                tableRowHtml += ' style="display: none;"';
-            }
-            tableRowHtml += " onkeydown=keydown()>";
-            table += tableRowHtml;
+            table += '<tr class="table-row clickable-row" tabindex="' + json[i].id + '" onkeydown=keydown()">';
             table += '<td scope="row" id="id" hidden = "true">' + json[i].id + "</th>";
             table +=
                 '<td id="tdcheck_' +
@@ -491,16 +444,6 @@ $("a.dropdown-item").click(function (e) {
     } */
 });
 
-//Start Datetimepicker for reports
-$(function () {
-    $("#datepicker")
-        .datepicker({
-            autoclose: true,
-            todayHighlight: true,
-        })
-        .datepicker("update", new Date());
-});
-
 //Format timePicker and filter table by date-time
 $(document).ready(function () {
     $("#datetimepicker").daterangepicker({
@@ -592,25 +535,6 @@ $("#csv").on("click", () => {
         document.body.removeChild(link);
     }
 });
-
-//Delete User event to Server
-
-alertMessage.addEventListener("cancel", (e) => {
-    document.getElementById("alertMessage").parentElement.style.display = "none";
-});
-alertMessage.addEventListener("check", (e) => {
-    console.log('Instance fired "something".', name_selected);
-    var id = name_selected;
-    socket.emit("deleteUser", id);
-    document.getElementById("alertMessage").parentElement.style.display = "none";
-});
-function deleteUser() {
-    console.log(contact_selected[0].cells[1].innerText);
-    var confirm = alertMessage.alertMessage(
-        "Tem certeza que deseja remover o contato " + contact_selected[0].cells[1].innerText + "?",
-        "confirm"
-    );
-}
 
 //Send Update State event to server
 function state(value) {
@@ -733,32 +657,6 @@ function priority(priority) {
     document.getElementById("card_priority").innerHTML = priority;
     socket.emit("state", json);
 }
-//Send Update Procedure event to server
-function procedure(procedure) {
-    var isoDateTime = new Date();
-    var localDate = dateYYYYMMDD(isoDateTime);
-    var localTime = isoDateTime.toLocaleTimeString("us", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        mili: "2-digit",
-        hour12: false,
-    });
-    var localTime = localTime + "." + isoDateTime.getMilliseconds();
-    var localtimeString = localDate + " " + localTime;
-    var id = document.getElementById("card_title").innerHTML;
-    var co = document.getElementById("card_comment").value;
-    var json = {
-        id: id,
-        procedure: procedure,
-        response_time: localtimeString,
-        operator: operator || "Usuário Externo",
-        comment: co + "\n" + procedure,
-    };
-    //console.log('procedure')
-    document.getElementById("card_procedure").innerHTML = procedure;
-    socket.emit("state", json);
-}
 
 // Filter Incidents  main Table
 
@@ -801,9 +699,39 @@ function filterByState(obj) {
 }
 
 function filterByDateTime(startDate, endDate) {
-    startDateFilter = startDate;
-    endDateFilter = endDate;
-    filter();
+    newEvents = 0;
+    var startDateBRT = new Date(startDate);
+    var endDateBRT = new Date(endDate);
+
+    var startDateUTC = new Date(startDateBRT.getTime() - startDateBRT.getTimezoneOffset() * 60000);
+    var endDateUTC = new Date(endDateBRT.getTime() - endDateBRT.getTimezoneOffset() * 60000);
+
+    socket.emit("hello", { start: startDateUTC.toISOString(), end: endDateUTC.toISOString() });
+
+    socket.off("newEvent")
+    socket.on("newEvent", function (msg) {
+        if (msg.length == 0) return;
+
+        console.log("receiving new event :", msg);
+        newEvents += msg.length;
+
+        events = document.getElementById("newEvents");
+
+        events.innerHTML = '<i class="fa fa-bell" aria-hidden="true"></i> ' + newEvents + " Eventos Novos";
+    });
+}
+
+function cancelFilter() {
+    socket.off("newEvent")
+    socket.on("newEvent", function (msg) {
+        if (msg.length == 0) return;
+    
+        console.log("receiving new event :", msg);
+        addToTable(msg);
+    });
+    socket.emit("hello", {start: moment().startOf("days"), end: moment().endOf("days")}, (res)=>{
+        buildTable(res)
+    })
 }
 
 function filter() {
@@ -814,7 +742,7 @@ function filter() {
         var f4 = true;
         var td1, td2, td3, td4, td5;
         activeIncidents = 0;
-        limitRows = 1010
+        limitRows = 1010;
         table = document.getElementById("table");
         tr = table.getElementsByTagName("tr");
 
@@ -861,13 +789,6 @@ function filter() {
                 f3 = txtValue.toUpperCase() == filterstate.toUpperCase();
             } else f3 = true;
 
-            // Filter By DateTime
-            if (startDateFilter && endDateFilter) {
-                var datetimeString = tr[i].getElementsByTagName("td")[7].textContent;
-                var rowDateTime = moment(datetimeString, "DD/MM/YYYY HH:mm:ss");
-                f4 = rowDateTime.isBetween(startDateFilter, endDateFilter);
-            }
-
             // Check filters
             if (f1 && f2 && f3 && f4 && td3) {
                 txtValue = td3.textContent || td3.innerText;
@@ -886,7 +807,6 @@ function filter() {
 
         // LIMIT ROWS
         limitRows - tr.length < 0 ? [...document.querySelectorAll("tr")].pop().remove() : null;
-
 
         active.innerHTML =
             '<i class="fa fa-exclamation-triangle triangle" aria-hidden="true"></i> ' + activeIncidents + " Incidentes Ativos";

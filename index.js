@@ -11,9 +11,9 @@ const message = require("./js/messages");
 const restapi = require("./js/restapi");
 const integrationServer = require("./js/integrationserver");
 const logs = require("./js/logs/logs");
-const classificationJSON = require('./translations.json');
+const classificationJSON = require("./translations.json");
 const log_base_path = "Dispatch";
-
+var startDateTime, endDateTime;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -116,6 +116,13 @@ io.on("connection", function (socket) {
         });
     });
 
+    socket.on("hello", (json) => {
+        console.log(json);
+        startDateTime = json.start
+        endDateTime = json.end
+        message.select_filter("events", json, (res) => socket.emit("Events", res));
+    });
+
     socket.on("abonado", (id, obj_id) => {
         logs.Write(`on abonado obj_id: ${obj_id} id: ${obj_id}`, "DEBUG", log_base_path);
         message.searchlike_order("comments", "eventid", id, "date", function (response) {
@@ -161,18 +168,14 @@ io.on("connection", function (socket) {
             message.insert("comments", comment_json, function (e) {
                 message.searchlike_order("comments", "eventid", json.id, "date", function (response) {
                     message.update(json.id, "events", json_update, function () {
-                        message.select("events", 1000, function (res) {
-                            io.emit("Events", res);
-                        });
+                        message.select_filter("events", {start: startDateTime, end: endDateTime}, (res) => io.emit("Events", res));
                     });
                     io.emit("comments", response);
                 });
             });
         } else {
             message.update(json.id, "events", json_update, function () {
-                message.select("events", 1000, function (res) {
-                    io.emit("Events", res);
-                });
+                message.select_filter("events", {start: startDateTime, end: endDateTime}, (res) => io.emit("Events", res));
             });
         }
         message.insert("logs", log, function (e) {
@@ -193,136 +196,6 @@ function getCameras(callback) {
     rest.getRequest("api/v1/cameras", function (res) {
         callback(res);
     });
-}
-
-function query(data, callback) {
-    //busqueda de resultados para reporte consolidado
-    console.log("--------QUERYS----------");
-    var query = null;
-    //SOLO FECHA
-    if (data.incident == "All" && data.cameras.length == 0 && data.state == "All") {
-        query =
-            'SELECT   * from "events"  where time between \'' +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' order by time desc ";
-    }
-    if (data.incident != "All" && data.cameras.length == 0 && data.state == "All") {
-        query =
-            'SELECT   * from "events"  where action = \'' +
-            data.incident +
-            "' and time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' order by time desc";
-    }
-
-    if (data.incident == "All" && data.cameras.length != 0 && data.state == "All") {
-        query =
-            'SELECT   * from "events"  where time between \'' +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' AND (";
-
-        for (var i = 0; i < data.cameras.length; i++) {
-            query += " camera_id = '" + data.cameras[i] + "'";
-            if (i + 1 != data.cameras.length) query += " OR ";
-        }
-
-        query += ") order by time desc ";
-    }
-    if (data.incident != "All" && data.cameras.length != 0 && data.state == "All") {
-        query =
-            'SELECT   * from "events"  where action = \'' +
-            data.incident +
-            "' and time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' AND (";
-
-        for (var i = 0; i < data.cameras.length; i++) {
-            query += " camera_id = '" + data.cameras[i] + "'";
-            if (i + 1 != data.cameras.length) query += " OR ";
-        }
-
-        query += ") order by time desc ";
-    }
-
-    if (data.incident == "All" && data.cameras.length == 0 && data.state != "All") {
-        query =
-            'SELECT   * from "events"  where state = \'' +
-            data.state +
-            "' and time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' order by time desc ";
-    }
-    if (data.incident != "All" && data.cameras.length == 0 && data.state != "All") {
-        query =
-            'SELECT   * from "events"  where  state = \'' +
-            data.state +
-            "' and  action = '" +
-            data.incident +
-            "' and time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' order by time desc";
-    }
-
-    if (data.database == "All" && data.cameras.length != 0 && data.state != "All") {
-        query =
-            'SELECT   * from "events"  where  state = \'' +
-            data.state +
-            "' and  time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' AND (";
-
-        for (var i = 0; i < data.cameras.length; i++) {
-            query += " camera_id = '" + data.cameras[i] + "'";
-            if (i + 1 != data.cameras.length) query += " OR ";
-        }
-
-        query += ") order by time desc ";
-    }
-    if (data.incident != "All" && data.cameras.length != 0 && data.state != "All") {
-        query =
-            'SELECT   * from "events"  where state = \'' +
-            data.state +
-            "'and  action = '" +
-            data.incident +
-            "' and time between '" +
-            new Date(data.dates.initial).toLocaleString() +
-            "' AND '" +
-            new Date(data.dates.final).toLocaleString() +
-            "' AND (";
-
-        for (var i = 0; i < data.cameras.length; i++) {
-            query += " camera_id = '" + data.cameras[i] + "'";
-            if (i + 1 != data.cameras.length) query += " OR ";
-        }
-
-        query += ") order by time desc ";
-    }
-
-    if (query != null) {
-        var options = { year: "numeric", month: "short", day: "numeric" };
-
-        message.query(query, function (res) {
-            if (res != null) {
-                //console.log("fechas:" + JSON.stringify(data.dates));
-                //console.log(res.length, " resultados encontrados");
-                callback(res);
-            } else callback(null);
-        });
-    } else callback(null);
 }
 
 function classifyEvent(e) {

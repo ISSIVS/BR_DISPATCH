@@ -257,6 +257,10 @@ body {
   color: rgba(255, 255, 255, 1);
 }
 
+#newEvents:hover {
+  cursor: pointer;
+}
+
 .triangle {
   color: #f00;
 }

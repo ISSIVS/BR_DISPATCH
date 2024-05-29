@@ -16,15 +16,20 @@ var startDateFilter, endDateFilter;
 var watchlistLPR = {};
 
 var socket = io();
+
+showLoadingIndicator();
 socket.on("newEvent", function (msg) {
+    
     if (msg.length == 0) return;
 
     console.log("receiving new event :", msg);
     addToTable(msg);
 });
 socket.on("Events", function (msg) {
+
     console.log("receiving event :", msg);
     buildTable(msg);
+    hideLoadingIndicator();
 });
 
 document.addEventListener(
@@ -430,22 +435,11 @@ $(".closeCard").click(function (e) {
 $("a.dropdown-item").click(function (e) {
     var action = e.currentTarget.innerHTML;
     state(action);
-
-    /* switch (action) {
-        case "Em Tratamento":
-            state("Em Tratamento");
-            break;
-        case "Solucionado":
-            state("Solucionado");
-            break;
-        case "Falha de Sistema":
-            state("Falha de Sistema");
-            break;
-    } */
 });
 
 //Format timePicker and filter table by date-time
 $(document).ready(function () {
+    socket.emit("filter", { start: moment().startOf("days"), end: moment().endOf("days") });
     $("#datetimepicker").daterangepicker({
         timePicker: true,
         timePicker24Hour: true,
@@ -699,6 +693,9 @@ function filterByState(obj) {
 }
 
 function filterByDateTime(startDate, endDate) {
+    showLoadingIndicator();
+
+    document.getElementById("datetimepicker").style.border = "dotted 3px #fff";
     newEvents = 0;
     var startDateBRT = new Date(startDate);
     var endDateBRT = new Date(endDate);
@@ -706,32 +703,52 @@ function filterByDateTime(startDate, endDate) {
     var startDateUTC = new Date(startDateBRT.getTime() - startDateBRT.getTimezoneOffset() * 60000);
     var endDateUTC = new Date(endDateBRT.getTime() - endDateBRT.getTimezoneOffset() * 60000);
 
-    socket.emit("hello", { start: startDateUTC.toISOString(), end: endDateUTC.toISOString() });
+    socket.emit("filter", { start: startDateUTC.toISOString(), end: endDateUTC.toISOString() });
 
-    socket.off("newEvent")
+    socket.off("newEvent");
     socket.on("newEvent", function (msg) {
         if (msg.length == 0) return;
 
         console.log("receiving new event :", msg);
-        newEvents += msg.length;
+        newEvents++;
 
         events = document.getElementById("newEvents");
 
         events.innerHTML = '<i class="fa fa-bell" aria-hidden="true"></i> ' + newEvents + " Eventos Novos";
+
+        hideLoadingIndicator();
     });
 }
 
+function showLoadingIndicator() {
+    // Display loading indicator (e.g., show a spinner)
+    var loadingIndicator = document.getElementById("loadingIndicator");
+    loadingIndicator.style.display = "block";
+}
+
+function hideLoadingIndicator() {
+    // Hide loading indicator
+    var loadingIndicator = document.getElementById("loadingIndicator");
+    loadingIndicator.style.display = "none";
+}
+
 function cancelFilter() {
-    socket.off("newEvent")
+    showLoadingIndicator();
+
+    document.getElementById("newEvents").innerHTML = "";
+    document.getElementById("datetimepicker").style.border = "";
+    socket.off("newEvent");
     socket.on("newEvent", function (msg) {
         if (msg.length == 0) return;
-    
+
         console.log("receiving new event :", msg);
         addToTable(msg);
     });
-    socket.emit("hello", {start: moment().startOf("days"), end: moment().endOf("days")}, (res)=>{
-        buildTable(res)
-    })
+    socket.emit("filter", { start: moment().startOf("days"), end: moment().endOf("days") }, (res) => {
+        console.log(res);
+        buildTable(res);
+        hideLoadingIndicator();
+    });
 }
 
 function filter() {
@@ -742,7 +759,7 @@ function filter() {
         var f4 = true;
         var td1, td2, td3, td4, td5;
         activeIncidents = 0;
-        limitRows = 1010;
+        limitRows = 100;
         table = document.getElementById("table");
         tr = table.getElementsByTagName("tr");
 
@@ -806,7 +823,7 @@ function filter() {
         active = document.getElementById("activeIncidents");
 
         // LIMIT ROWS
-        limitRows - tr.length < 0 ? [...document.querySelectorAll("tr")].pop().remove() : null;
+        // while(limitRows - tr.length < 0) [...document.querySelectorAll("tr")].pop().remove()
 
         active.innerHTML =
             '<i class="fa fa-exclamation-triangle triangle" aria-hidden="true"></i> ' + activeIncidents + " Incidentes Ativos";

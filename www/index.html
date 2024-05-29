@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="socket.io/socket.io.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
         <link href="css/datepicker.css" rel="stylesheet" type="text/css" />
@@ -47,8 +47,8 @@
                         >
                     </li>
                 </ul>
-                <span class="navbar-text newEvents" id="newEvents"></span>
-                <span class="navbar-text activeIncidents" onclick="cancelFilter()" id="activeIncidents"></span>
+                <span class="navbar-text newEvents" onclick="cancelFilter()" id="newEvents"></span>
+                <span class="navbar-text activeIncidents" id="activeIncidents"></span>
                 <span class="navbar-text user" style="color: rgba(255, 255, 255, 0.5)" id="test"> Usuário Externo</span>
             </div>
         </nav>
@@ -253,6 +253,10 @@
             <div class="col-md-12">
                 <button class="btn btn-danger" id="pdf">Exportar para PDF</button>
                 <button class="btn btn-success" id="csv">Exportar para CSV</button>
+            </div>
+            
+            <div id="loadingIndicator" class="loading-indicator">
+                <div class="loading-spinner"></div>
             </div>
         </div>
 

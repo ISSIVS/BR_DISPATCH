@@ -108,19 +108,17 @@ app.post("/events", function (req, res) {
 //socket io connection
 io.on("connection", function (socket) {
     logs.Write(`New Client connection`, "DEBUG", log_base_path);
-    getCameras(function (res) {
-        logs.Write(`getCameras : ${res}`, "DEBUG", log_base_path);
-        socket.emit("getCameras", res);
-        message.select("events", 1000, function (res) {
-            socket.emit("Events", res);
-        });
-    });
 
-    socket.on("hello", (json) => {
-        console.log(json);
-        startDateTime = json.start
-        endDateTime = json.end
-        message.select_filter("events", json, (res) => socket.emit("Events", res));
+    socket.on("filter", (json) => {
+        try {
+            console.log(json);
+            startDateTime = json.start;
+            endDateTime = json.end;
+            message.select_filter("events", json, (res) => socket.emit("Events", res));
+        } catch (e) {
+            console.log(e);
+            logs.Write("ERROR: " + e, "ERROR", log_base_path);
+        }
     });
 
     socket.on("abonado", (id, obj_id) => {
@@ -168,14 +166,14 @@ io.on("connection", function (socket) {
             message.insert("comments", comment_json, function (e) {
                 message.searchlike_order("comments", "eventid", json.id, "date", function (response) {
                     message.update(json.id, "events", json_update, function () {
-                        message.select_filter("events", {start: startDateTime, end: endDateTime}, (res) => io.emit("Events", res));
+                        message.select_filter("events", { start: startDateTime, end: endDateTime }, (res) => io.emit("Events", res));
                     });
                     io.emit("comments", response);
                 });
             });
         } else {
             message.update(json.id, "events", json_update, function () {
-                message.select_filter("events", {start: startDateTime, end: endDateTime}, (res) => io.emit("Events", res));
+                message.select_filter("events", { start: startDateTime, end: endDateTime }, (res) => io.emit("Events", res));
             });
         }
         message.insert("logs", log, function (e) {

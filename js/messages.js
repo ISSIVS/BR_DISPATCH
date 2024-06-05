@@ -107,17 +107,21 @@ function select(table, limit, callback) {
 }
 
 function select_filter(table, dates, callback) {
-  var startDate = new Date(dates.start);
-  var endDate = new Date(dates.end);
+    try {
+        var startDate = new Date(dates.start);
+        var endDate = new Date(dates.end);
 
-  var formattedStartDate = startDate.toISOString();
-  var formattedEndDate = endDate.toISOString();
-  
-  var SelectQuery = `SELECT * FROM ${table} WHERE time BETWEEN '${formattedStartDate}' AND '${formattedEndDate}' ORDER BY id DESC`;
+        var formattedStartDate = startDate.toISOString();
+        var formattedEndDate = endDate.toISOString();
 
-  pg.query(SelectQuery, function (res) {
-      callback(res.rows);
-  });
+        var SelectQuery = `SELECT * FROM ${table} WHERE time BETWEEN '${formattedStartDate}' AND '${formattedEndDate}' ORDER BY id DESC`;
+
+        pg.query(SelectQuery, function (res) {
+            callback(res.rows);
+        });
+    } catch (e) {
+        console.log(e)
+    }
 }
 
 function search(table, id, callback) {
@@ -166,6 +170,20 @@ function _delete(table, id, callback) {
     });
 }
 
+function limit_database(interval, callback) {
+    const tablesToDeleteFrom = ["events", "comments"];
+    var DeleteQuery = "";
+    for (const table of tablesToDeleteFrom) {
+        DeleteQuery += `DELETE FROM ${table} WHERE ${
+            table == "events" || table == "logs" ? "time" : "date"
+        } < current_timestamp - interval '${interval}';\n`;
+    }
+    console.log("limit_database", DeleteQuery);
+    pg.query(DeleteQuery, (res) => {
+        callback(res);
+    });
+}
+
 function query(query, callback) {
     //console.log(SelectQuery);
     pg.query(query, function (res) {
@@ -184,4 +202,5 @@ exports.search = search;
 exports.searchlike = searchlike;
 exports.searchlike_order = searchlike_order;
 exports._delete = _delete;
+exports.limit_database = limit_database;
 exports.query = query;

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
+    "node-cron": "^3.0.3",
     "node-windows": "^1.0.0-beta.8",
     "npm": "^10.8.0",
     "pg": "^8.5.1",

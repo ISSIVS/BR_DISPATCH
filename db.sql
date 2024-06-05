@@ -39,13 +39,6 @@ COMMENT ON COLUMN events.type IS 'Usually CAM
 COMMENT ON COLUMN events.state IS 'New, In Progress, Resolved, Closed';
 COMMENT ON COLUMN events.comment IS 'Operator comment abour incident';
 COMMENT ON COLUMN events.priority IS 'High, Medium, Low';
-COMMENT ON COLUMN events.procedure IS 'â€˜Started monitoring the incidentâ€™
-â€˜Stopped monitoring the incidentâ€™
-â€˜Escalated issue to supervisorâ€™
-â€˜Called local site security personnelâ€™
-â€˜Called central monitoring security personnelâ€™
-â€˜Called 911â€™
-â€˜Called maintenance to look at camera related issueâ€™';
 COMMENT ON COLUMN events.action IS 'Transfer,False Alarm,Export Incident';
 
 -- Table: logs

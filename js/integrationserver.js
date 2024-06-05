@@ -7,7 +7,7 @@
  *|I|N|T|E|G|R|A|T|I|O|N| |S|E|R|V|E|R| 
  *+-+-+-+-+-+-+-+ 
  *
- * require request Modu le - npm install --save request
+ * require request Module - npm install --save request
 **/
 const request = require('request');
 

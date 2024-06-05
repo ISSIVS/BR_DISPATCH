@@ -19,14 +19,12 @@ var socket = io();
 
 showLoadingIndicator();
 socket.on("newEvent", function (msg) {
-    
     if (msg.length == 0) return;
 
     console.log("receiving new event :", msg);
-    addToTable(msg);
+    buildTable(msg, true);
 });
 socket.on("Events", function (msg) {
-
     console.log("receiving event :", msg);
     buildTable(msg);
     hideLoadingIndicator();
@@ -58,162 +56,35 @@ var tabindex = undefined;
 /////////////////////////////////////TABLA INCIDENTES/////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-function addToTable(json) {
-    // console.log("addtotalbe json:",json)
-    // var cam_select = document.getElementById("cam_select");
-
+function buildTable(json, addToTable = false) {
+    var table = "";
     var ids = $("tr")
         .map(function () {
             return parseInt($(this).attr("tabIndex"));
         })
         .get();
-    //console.log(ids)
+
     for (var i = 0; i < json.length; i++) {
         var id = parseInt(json[i].id);
-        //console.log(ids.find(element=>element.tabIndex==id),id)
         const elementoEncontrado = ids.indexOf(id);
-        //const elementoEncontrado = ids.find((index, elemento) => parseInt($(elemento)) == id);
-        //console.log(elementoEncontrado)
-        if (elementoEncontrado == -1) {
-            var table = "";
+        if (addToTable && elementoEncontrado != -1) continue;
 
-            table += '<tr class="table-row clickable-row" tabindex="' + json[i].id + '" onkeydown=keydown()">';
-            table += '<td scope="row" id="id" hidden = "true">' + json[i].id + "</th>";
-            table +=
-                '<td id="tdcheck_' +
-                json[i].id +
-                '" ><input type="checkbox" id="check_' +
-                json[i].id +
-                '" name="' +
-                json[i].object_id +
-                '" value="1"></td>';
-            json[i].camera_id = json[i].cam_id;
+        table += '<tr class="table-row clickable-row" tabindex="' + json[i].id + '" onkeydown="keydown()">';
 
-            if (json[i].type == "FACE_X_SERVER" && json[i].action == "MATCH") {
-                var params = JSON.parse(json[i].incident);
-                json[i].camera_id = params.cam_id;
-                switch (params.list.priority) {
-                    case 0:
-                        json[i].priority = "Alta";
-                        break;
-                    case 1:
-                        json[i].priority = "Média";
-                        break;
-                    case 2:
-                        json[i].priority = "Baixa";
-                        break;
-                }
-                json[i].camera_id = params.cam_id;
-                json[i].name = params.person.first_name + " " + params.person.last_name;
-                json[i].comment = params.person.notes;
+        // Setting ID
+        table += '<td scope="row" id="id" hidden="true">' + json[i].id + "</td>";
 
-                //console.log(params)
-            }
-
-            if (json[i].type == "CAM") {
-                json[i].camera_id = json[i].object_id;
-            }
-
-            if (json[i].type == "FACE_X_SERVER") {
-                json[i].type = "FACEX";
-            }
-
-            if (json[i].type == "HTTP_EVENT_PROXY") {
-                json[i].type = "EVENT_GATE";
-                // json[i].incident = "Instrusão detectada";
-                try {
-                    json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
-                } catch (e) {
-                    json[i].camera_id = json[i].cam_id;
-                }
-            }
-
-            if (json[i].action == "VCA_EVENT") {
-                try {
-                    json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-
-            // MODIFY UPCOMING EVENTS INFO HERE (e.g., type, camId, comment, etc.)
-
-            if (json[i].priority == "undefined") {
-                json[i].priority = "";
-                table += '<td id="priority" hidden="true" class="to_hide"   value=""></td>';
-            } else {
-                if (json[i].priority == "Alta")
-                    table +=
-                        '<td id="priority" hidden="true" class="to_hide"   value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
-                else if (json[i].priority == "Média")
-                    table +=
-                        '<td id="priority" hidden="true" class="to_hide"   value="Média"><i class="fa fa-exclamation-circle"></i></td>';
-                else
-                    table +=
-                        '<td id="priority" hidden="true" class="to_hide"   value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
-            }
-            if (json[i].type == "GENERIC_USER") table += '<td id="type" >' + "USER" + "</td>";
-            else table += '<td id="type" >' + json[i].type + "</td>";
-
-            table += '<td id="object_id" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
-            table += '<td id="name" >' + json[i].name + "</td>";
-            table += '<td id="incident"  >' + json[i].incident + "</td>";
-            table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
-            table += '<td id="state"   class="to_hide">' + json[i].state || "" + "</td>";
-            table += '<td id="operator"  class="to_hide">' + json[i].operator + "</td>";
-            if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
-            else
-                table +=
-                    '<td id="responsetime"  class="to_hide">' +
-                    new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) +
-                    "</td>";
-            if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
-            else
-                table +=
-                    '<td id="resolution_time"  class="to_hide">' +
-                    new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
-                    "</td>";
-            table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
-            table += '<td hidden="true" id="action"  class="to_hide">' + json[i].action + "</td>";
-            table += '<td hidden="true" id="priority"  class="to_hide">' + json[i].priority + "</td>";
-            table += '<td hidden="true" id="procedure"  class="to_hide">' + json[i].procedure + "</td>";
-            table += '<td hidden="true"id="id_cam"  class="to_hide">' + json[i].camera_id + "</td>";
-            table += '<td hidden="true"id="params"  class="to_hide">' + json[i].params + "</td>";
-            table += "</tr>";
-
-            try {
-                const regex = /null/gi;
-                table = table.replace(regex, "");
-                var rows = $("#rows");
-                rows.prepend(table);
-                rows.find("tr").addClass("tbody");
-                filter();
-            } catch (e) {
-                document.getElementById("test").innerHTML = "Error 303: " + e;
-            }
-        }
-    }
-
-    ready($);
-}
-
-function buildTable(json) {
-    //var cam_select = document.getElementById("cam_select");
-    var table = "";
-
-    for (var i = 0; i < json.length; i++) {
-        table += '<tr class="table-row clickable-row" tabindex="' + json[i].id + '" onkeydown=keydown()">';
-        table += '<td scope="row" id="id" hidden = "true">' + json[i].id + "</th>";
+        // Setting checkbox
         table +=
             '<td id="tdcheck_' +
             json[i].id +
-            '"  ><input type="checkbox" id="check_' +
+            '"><input type="checkbox" id="check_' +
             json[i].id +
             '" name="' +
             json[i].object_id +
             '" value="1"></td>';
-        json[i].camera_id = json[i].cam_id;
 
+        // Handling type conversions and assignments
         if (json[i].type == "FACE_X_SERVER" && json[i].action == "MATCH") {
             var params = JSON.parse(json[i].incident);
             json[i].camera_id = params.cam_id;
@@ -228,31 +99,20 @@ function buildTable(json) {
                     json[i].priority = "Baixa";
                     break;
             }
-            json[i].camera_id = params.cam_id;
             json[i].name = params.person.first_name + " " + params.person.last_name;
             json[i].comment = params.person.notes;
-
-            //console.log(params)
-        }
-        if (json[i].type == "CAM") {
+        } else if (json[i].type == "CAM") {
             json[i].camera_id = json[i].object_id;
-        }
-
-        if (json[i].type == "FACE_X_SERVER") {
+        } else if (json[i].type == "FACE_X_SERVER") {
             json[i].type = "FACEX";
-        }
-
-        if (json[i].type == "HTTP_EVENT_PROXY") {
+        } else if (json[i].type == "HTTP_EVENT_PROXY") {
             json[i].type = "EVENT_GATE";
-            // json[i].incident = "Instrusão detectada";
             try {
                 json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
             } catch (e) {
                 json[i].camera_id = json[i].cam_id;
             }
-        }
-
-        if (json[i].action == "VCA_EVENT") {
+        } else if (json[i].action == "VCA_EVENT") {
             try {
                 json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
             } catch (e) {
@@ -260,56 +120,70 @@ function buildTable(json) {
             }
         }
 
-        // MODIFY OLD EVENTS INFO HERE (e.g., type, camId, comment, etc.)
-
-        if (json[i].priority == "undefined") {
-            json[i].priority = "";
-            table += '<td id="priority" hidden="true" class="to_hide"   value=""></td>';
-        } else {
-            if (json[i].priority == "Alta")
-                table += '<td id="priority" hidden="true" class="to_hide"   value="Alta"><i class="fa fa-exclamation-triangle"></i></td>';
-            else if (json[i].priority == "Média")
-                table += '<td id="priority" hidden="true" class="to_hide"   value="Média"><i class="fa fa-exclamation-circle"></i></td>';
-            else
-                table +=
-                    '<td id="priority" hidden="true" class="to_hide"   value="Baixa"><i class="fa fa-info-circle" aria-hidden="true"></i></td>';
+        // Handling priority and adding table cells accordingly
+        var priorityIcon = "";
+        switch (json[i].priority) {
+            case "Alta":
+                priorityIcon = '<i class="fa fa-exclamation-triangle"></i>';
+                break;
+            case "Média":
+                priorityIcon = '<i class="fa fa-exclamation-circle"></i>';
+                break;
+            case "Baixa":
+                priorityIcon = '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+                break;
         }
-        if (json[i].type == "GENERIC_USER") table += '<td id="type" >' + "USER" + "</td>";
-        else table += '<td id="type" >' + json[i].type + "</td>";
+        table += '<td id="priority" hidden="true" class="to_hide" value="' + (json[i].priority || "") + '">' + priorityIcon + "</td>";
 
+        // Adding other table cells
+        table += '<td id="type">' + (json[i].type == "GENERIC_USER" ? "USER" : json[i].type) + "</td>";
         table += '<td id="object_id" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
-        table += '<td id="name" >' + json[i].name + "</td>";
-        table += '<td id="incident"  >' + json[i].incident + "</td>";
-        table += '<td id="time" >' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
-        table += '<td id="state"   class="to_hide">' + json[i].state || "" + "</td>";
-        table += '<td id="operator"  class="to_hide">' + json[i].operator + "</td>";
-        if (json[i].response_time == null) table += '<td id="responsetime"  class="to_hide"></td>';
-        else
-            table +=
-                '<td id="responsetime"  class="to_hide">' + new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) + "</td>";
-        if (json[i].resolution_time == null) table += '<td id="resolution_time"  class="to_hide"></td>';
-        else
-            table +=
-                '<td id="resolution_time"  class="to_hide">' +
-                new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) +
-                "</td>";
-        table += '<td hidden="true" id="comment"  class="to_hide">' + json[i].comment + "</td>";
-        table += '<td hidden="true" id="action"  class="to_hide">' + json[i].action + "</td>";
-        table += '<td hidden="true" id="priority"  class="to_hide">' + json[i].priority + "</td>";
-        table += '<td hidden="true" id="procedure"  class="to_hide">' + json[i].procedure + "</td>";
-        table += '<td hidden="true"id="id_cam"  class="to_hide"ss>' + json[i].camera_id + "</td>";
-        table += '<td hidden="true"id="params"  class="to_hide"ss>' + json[i].params + "</td>";
+        table += '<td id="name">' + json[i].name + "</td>";
+        table += '<td id="incident">' + json[i].incident + "</td>";
+        table += '<td id="time">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
+        table += '<td id="state" class="to_hide">' + (json[i].state || "") + "</td>";
+        table += '<td id="operator" class="to_hide">' + json[i].operator + "</td>";
+        table +=
+            '<td id="responsetime" class="to_hide">' +
+            (json[i].response_time ? new Date(json[i].response_time).toLocaleTimeString("pt-br", options5) : "") +
+            "</td>";
+        table +=
+            '<td id="resolution_time" class="to_hide">' +
+            (json[i].resolution_time ? new Date(json[i].resolution_time).toLocaleTimeString("pt-br", options5) : "") +
+            "</td>";
+        table += '<td hidden="true" id="comment" class="to_hide">' + json[i].comment + "</td>";
+        table += '<td hidden="true" id="action" class="to_hide">' + json[i].action + "</td>";
+        table += '<td hidden="true" id="priority" class="to_hide">' + json[i].priority + "</td>";
+        table += '<td hidden="true" id="procedure" class="to_hide">' + json[i].procedure + "</td>";
+        table += '<td hidden="true" id="id_cam" class="to_hide">' + json[i].camera_id + "</td>";
+        table += '<td hidden="true" id="params" class="to_hide">' + json[i].params + "</td>";
         table += "</tr>";
+
+        if (addToTable) {
+            try {
+                const regex = /null/gi;
+                table = table.replace(regex, "");
+                var rows = $("#rows");
+                rows.prepend(table);
+                rows.find("tr").addClass("tbody");
+                filter();
+            } catch (e) {
+                document.getElementById("test").innerHTML = "Error 303: " + e;
+            }
+        }
     }
-    try {
-        const regex = /null/gi;
-        table = table.replace(regex, "");
-        var rows = document.getElementById("rows");
-        rows.innerHTML = table;
-        rows.classList.add("tbody");
-        filter();
-    } catch (e) {
-        document.getElementById("test").innerHTML = "Error 303: " + e;
+
+    if (!addToTable) {
+        try {
+            const regex = /null/gi;
+            table = table.replace(regex, "");
+            var rows = document.getElementById("rows");
+            rows.innerHTML = table;
+            rows.classList.add("tbody");
+            filter();
+        } catch (e) {
+            document.getElementById("test").innerHTML = "Error 303: " + e;
+        }
     }
 
     ready($);
@@ -446,6 +320,7 @@ $(document).ready(function () {
         locale: {
             format: "DD/MM/YYYY HH:mm:ss",
         },
+        opens: "center",
     });
 
     $("#datetimepicker").on("apply.daterangepicker", function (ev, picker) {
@@ -742,7 +617,7 @@ function cancelFilter() {
         if (msg.length == 0) return;
 
         console.log("receiving new event :", msg);
-        addToTable(msg);
+        buildTable(msg, true);
     });
     socket.emit("filter", { start: moment().startOf("days"), end: moment().endOf("days") }, (res) => {
         console.log(res);
@@ -836,7 +711,7 @@ function newMessage(e) {
     e.preventDefault();
 }
 
-//-------------------------------------SecurOS  SECTTION -------------------------------------
+//-------------------------------------SecurOS  SECTION -------------------------------------
 //This integration, only work when the front Ends is used into SecurOS Desktop
 //
 var operator;
@@ -893,9 +768,6 @@ function seleccionarTodos() {
 }
 function check1() {
     console.log("check1");
-    var icono = document.getElementById("check1");
-    //icono.classList.toggle("clicked");
-
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
     for (var i = 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked) {
@@ -1020,13 +892,13 @@ function live() {
     var cam_id = document.getElementById("card_title").innerHTML;
     var specificTdElement = document.querySelectorAll('[tabindex="' + cam_id + '"]');
     cam_id = specificTdElement[0].querySelector("#id_cam").textContent;
-    //var cam_id = document.getElementById('card_id').innerHTML;
+    // var cam_id = document.getElementById('card_id').innerHTML;
     // var expresionRegular = /\s*,\s*/;
-    //var listaCamaras = cam_id.split(expresionRegular);
-    //var mode = ''
-    //if (listaCamaras.length > 1)
+    // var listaCamaras = cam_id.split(expresionRegular);
+    // var mode = ''
+    // if (listaCamaras.length > 1)
     //    mode = '2x2'
-    //else
+    // else
     mode = "1x1";
 
     console.log('live {"mode":' + mode + ',"seq":"' + cam_id.replace(",", "|") + '"}');

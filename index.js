@@ -5,14 +5,16 @@ var server = http.createServer(app);
 var bodyParser = require("body-parser");
 var path = require("path");
 var io = require("socket.io")(server);
+var cron = require("node-cron");
 const configuration = require("./config");
 const http_modules = require("./js/pg");
 const message = require("./js/messages");
 const restapi = require("./js/restapi");
 const integrationServer = require("./js/integrationserver");
 const logs = require("./js/logs/logs");
+const moment = require("./www/js/moment");
 const classificationJSON = require("./translations.json");
-const log_base_path = "Dispatch";
+const log_base_path = "GEA";
 var startDateTime, endDateTime;
 
 app.use(bodyParser.json());
@@ -179,6 +181,17 @@ io.on("connection", function (socket) {
         message.insert("logs", log, function (e) {
             logs.Write(`message.insert "logs": ${e}`, "DEBUG", log_base_path);
         });
+    });
+});
+
+// Limit tables (events and comments) data
+cron.schedule("* 12 * * *", () => {
+    message.limit_database("24 hours", (res) => {
+        logs.Write( 
+            res[0].rowCount + " linhas deletadas da tabela eventos; "+ res[1].rowCount + " linhas deletadas da tabela comments"
+        ,"DEBUG", log_base_path);
+        if (res[0].rowCount == 0) return;
+        message.select_filter("events", { start: moment().startOf("days"), end: moment().endOf("days") }, (res) => io.emit("Events", res), "INFO", log_base_path);
     });
 });
 

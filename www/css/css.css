@@ -518,7 +518,11 @@ section {
 
 th {
   text-align: center;
+  cursor: pointer;
+}
 
+th:hover, th:hover *{
+  transition: all .5s;
 }
 
 .col-md-6 .to_hide {

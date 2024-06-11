@@ -84,9 +84,9 @@ function buildTable(json, addToTable = false) {
             json[i].object_id +
             '" value="1"></td>';
 
-        // Handling type conversions and assignments
         if (json[i].type == "FACE_X_SERVER" && json[i].action == "MATCH") {
-            var params = JSON.parse(json[i].incident);
+            var params = JSON.parse(JSON.parse(json[i].params).comment);
+
             json[i].camera_id = params.cam_id;
             switch (params.list.priority) {
                 case 0:
@@ -101,26 +101,33 @@ function buildTable(json, addToTable = false) {
             }
             json[i].name = params.person.first_name + " " + params.person.last_name;
             json[i].comment = params.person.notes;
-        } else if (json[i].type == "CAM") {
+        } 
+        if (json[i].type == "CAM") {
             json[i].camera_id = json[i].object_id;
-        } else if (json[i].type == "FACE_X_SERVER") {
+        } 
+        if (json[i].type == "FACE_X_SERVER") {
             json[i].type = "FACEX";
-        } else if (json[i].type == "HTTP_EVENT_PROXY") {
+        } 
+        if (json[i].type == "HTTP_EVENT_PROXY") {
             json[i].type = "EVENT_GATE";
             try {
                 json[i].object_id = JSON.parse(JSON.parse(json[i].params).comment).ID;
             } catch (e) {
                 json[i].camera_id = json[i].cam_id;
             }
-        } else if (json[i].action == "VCA_EVENT") {
+        } 
+         if (json[i].action == "VCA_EVENT") {
             try {
                 json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
             } catch (e) {
                 console.error(e);
             }
+        } 
+         if (json[i].type == "LPR_CAM") {
+            json[i].name = JSON.parse(json[i].params).number
+            json[i].camera_id = JSON.parse(json[i].params).camera_id;
         }
 
-        // Handling priority and adding table cells accordingly
         var priorityIcon = "";
         switch (json[i].priority) {
             case "Alta":
@@ -319,6 +326,24 @@ $(document).ready(function () {
         timePicker24Hour: true,
         locale: {
             format: "DD/MM/YYYY HH:mm:ss",
+            applyLabel: "Aplicar",
+            cancelLabel: "Cancelar",
+            customRangeLabel: "Custom",
+            daysOfWeek: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+            monthNames: [
+                "Janeiro",
+                "Fevereiro",
+                "Março",
+                "Abril",
+                "Maio",
+                "Junho",
+                "Julho",
+                "Agosto",
+                "Setembro",
+                "Outubro",
+                "Novembro",
+                "Dezembro",
+            ],
         },
         opens: "center",
     });
@@ -341,7 +366,7 @@ $("#pdf").on("click", () => {
         if (table.rows[i].style.display !== "none") {
             var rowData = [];
             var cells = table.rows[i].cells;
-            for (var j = 3; j <= 14; j++) {
+            for (var j = 3; j <= 13; j++) {
                 rowData.push(cells[j].innerText);
             }
             tableData.push(rowData);
@@ -358,7 +383,7 @@ $("#pdf").on("click", () => {
             {
                 table: {
                     body: tableData,
-                    widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", 50, "auto", "auto"],
+                    widths: ["auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", "auto", 50, "auto"],
                 },
             },
         ],
@@ -385,7 +410,7 @@ $("#csv").on("click", () => {
     for (let i = 0; i < table.rows.length; i++) {
         if (table.rows[i].style.display !== "none") {
             let row = [];
-            for (let j = 3; j <= table.rows[i].cells.length - 3; j++) {
+            for (let j = 3; j <= table.rows[i].cells.length - 4; j++) {
                 row.push(table.rows[i].cells[j].innerText);
             }
             csv.push(row.join(";"));

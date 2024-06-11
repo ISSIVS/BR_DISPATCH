@@ -185,15 +185,15 @@ io.on("connection", function (socket) {
 });
 
 // Limit tables (events and comments) data
-cron.schedule("* 12 * * *", () => {
-    message.limit_database("24 hours", (res) => {
+/* cron.schedule("* * * * *", () => {
+    message.limit_database("", (res) => {
         logs.Write( 
             res[0].rowCount + " linhas deletadas da tabela eventos; "+ res[1].rowCount + " linhas deletadas da tabela comments"
         ,"DEBUG", log_base_path);
         if (res[0].rowCount == 0) return;
         message.select_filter("events", { start: moment().startOf("days"), end: moment().endOf("days") }, (res) => io.emit("Events", res), "INFO", log_base_path);
     });
-});
+}); */
 
 function getObject(body, callback) {
     intServer.getObject(body, function (res) {

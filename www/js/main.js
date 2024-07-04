@@ -101,13 +101,13 @@ function buildTable(json, addToTable = false) {
             }
             json[i].name = params.person.first_name + " " + params.person.last_name;
             json[i].comment = params.person.notes;
-        } 
+        }
         if (json[i].type == "CAM") {
             json[i].camera_id = json[i].object_id;
-        } 
+        }
         if (json[i].type == "FACE_X_SERVER") {
             json[i].type = "FACEX";
-        } 
+        }
         if (json[i].type == "HTTP_EVENT_PROXY") {
             json[i].type = "EVENT_GATE";
             try {
@@ -115,16 +115,16 @@ function buildTable(json, addToTable = false) {
             } catch (e) {
                 json[i].camera_id = json[i].cam_id;
             }
-        } 
-         if (json[i].action == "VCA_EVENT") {
+        }
+        if (json[i].action == "VCA_EVENT") {
             try {
                 json[i].incident = JSON.parse(JSON.parse(json[i].params).comment).description;
             } catch (e) {
                 console.error(e);
             }
-        } 
-         if (json[i].type == "LPR_CAM") {
-            json[i].name = JSON.parse(json[i].params).number
+        }
+        if (json[i].type == "LPR_CAM") {
+            json[i].name = JSON.parse(json[i].params).number;
             json[i].camera_id = JSON.parse(json[i].params).camera_id;
         }
 
@@ -147,7 +147,8 @@ function buildTable(json, addToTable = false) {
         table += '<td id="object_id" style="text-align:center" class="to_hide">' + json[i].object_id + "</td>";
         table += '<td id="name">' + json[i].name + "</td>";
         table += '<td id="incident">' + json[i].incident + "</td>";
-        table += '<td id="time">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "</td>";
+        table +=
+            '<td id="time">' + new Date(json[i].time).toLocaleDateString("pt-br", options2) + "." + json[i].time.slice(-4, -1) + "</td>";
         table += '<td id="state" class="to_hide">' + (json[i].state || "") + "</td>";
         table += '<td id="operator" class="to_hide">' + json[i].operator + "</td>";
         table +=

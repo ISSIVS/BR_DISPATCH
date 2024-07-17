@@ -941,6 +941,49 @@ function live() {
     }
 }
 
+// FaceX Function
+// New
+window.addEventListener("click", () => {
+    if (document.querySelector(".table-selected > #type").innerHTML != "FACEX") {
+        try {
+            ISScustomAPI.sendEvent("CAM", "1", "CLEAR");
+        } catch (e) {
+            document.getElementById("test").innerHTML = e;
+        }
+    } else {
+        const ip_address = "localhost";
+        const rest_api_port = "8888";
+        const auth = { Authorization: `Basic ${btoa("Admin:123")}` };
+
+        var params = document.querySelector(".table-selected > #params").textContent;
+
+        if (!params.includes("detection")) return;
+
+        var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
+        const url = `http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId}`;
+        confirm(url);
+        
+        try {
+            fetch(url, { method: "GET", headers: auth })
+                .then((response) => response.json())
+                .then((json) => {
+                    ISScustomAPI.sendEvent(
+                        "CAM",
+                        "1",
+                        "FACE_X_INFO",
+                        JSON.stringify({ cam_name: json.data.name || "teste", params: params })
+                    );
+                })
+                .catch((e) => {
+                    document.getElementById("test").innerHTML = e;
+                    console.log(e);
+                });
+        } catch (e) {
+            document.getElementById("test").innerHTML = e;
+        }
+    }
+});
+
 //Dates funtions
 function dateToDDMMYY(date) {
     var d = date.getDate();

@@ -953,7 +953,8 @@ window.addEventListener("click", () => {
     } else {
         const ip_address = "localhost";
         const rest_api_port = "8888";
-        const auth = { Authorization: `Basic ${btoa("Admin:123")}` };
+        const [username, password] = ["Admin", "123"];
+        const auth = { Authorization: `Basic ${btoa(username + ":" + password)}` };
 
         var params = document.querySelector(".table-selected > #params").textContent;
 
@@ -962,7 +963,7 @@ window.addEventListener("click", () => {
         var camId = JSON.parse(JSON.parse(params).comment.replace(/:\s*,/g, ': "",')).cam_id;
         const url = `http://${ip_address}:${rest_api_port}/api/v1/cameras/${camId}`;
         confirm(url);
-        
+
         try {
             fetch(url, { method: "GET", headers: auth })
                 .then((response) => response.json())

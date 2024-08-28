@@ -14,35 +14,82 @@ ISScustomAPI.onEvent((type, id, action, params) => {
     }
 
     document.getElementById("recognition-list").innerHTML = "";
+    document.getElementById("recognition-list").style.height = "100vh";
     let addNewRecognition = "";
 
-    let data = JSON.parse(params.params).comment;
-    let params2 = JSON.parse(data.replace(/:\s*,/g, ': "",'));
+    if (params.type == "MURALHA") {
+        let data = JSON.parse(params.params);
 
-    let serverIp = JSON.parse(params.params).__source;
-    let priority = params2.list.priority;
-    // let camId = params2.cam_id;
-    let camName = params.cam_name;
+        let camName = data.cam_id;
+        let recognitionImgSrc = data.image;
+        let personName = data.name;
+        let timestamp = data.timestamp.slice(0, -4);
+        let comment = data.comment;
 
-    let watchlistName = params2.list.name;
+        recognition = document.createElement("div");
+        recognition.innerHTML = `
+            <div style="height:100vh" class="recognition">
+                <div class="software-images">
+                    <div class="recognition-image">
+                        <img src="${recognitionImgSrc}">
+                    </div>
+                </div>
+            
+                <div class="recognition-info1">
+                    <div class="recognition-date">
+                        <img src="css/assets/svg/icon-time.svg">
+                        <p class="recog-title">${timestamp}</p>
+                    </div>
+            
+                    <!--<img class="icon-more" src="css/assets/svg/icon-more.svg">-->
+            
+                    <div class="recognition-camera">
+                        <img src="css/assets/svg/icon-cam.svg">
+                        <p class="recog-title">${camName}</p>
+                    </div>
+            
+                    <div class="person-name">
+                        <img src="css/assets/svg/icon-user.svg">
+                        <p class="recog-title">${personName}</p>
+                    </div>
 
-    let recognitionImgSrc = `http://${serverIp.split(":")[0]}:21093${params2.matched_person_face_image._links.source}`;
-    let watchlistImgSrc = `http://${serverIp.split(":")[0]}:21093${params2._links.detection_image}`;
-
-    let similarity = Number(params2.similarity).toFixed(2) * 100;
-    let personName = params2.person.first_name + " " + params2.person.middle_name + " " + params2.person.last_name;
-    let timestamp = convertUTCDate(params2.timestamp);
-
-    if (priority == 0) {
-        addNewRecognition = "recognition";
-    } else if (priority == 1) {
-        addNewRecognition = "info-recognition";
+                    <div class="operator-list">
+                        <p class="recog-title">${comment}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        // document.write(priority);
+        var recognitionList = window.document.getElementById("recognition-list");
+        recognitionList.insertBefore(recognition, recognitionList.firstChild);
     } else {
-        addNewRecognition = "white-recognition";
-    }
+        let data = JSON.parse(params.params).comment;
+        let params2 = JSON.parse(data.replace(/:\s*,/g, ': "",'));
 
-    recognition = document.createElement("div");
-    recognition.innerHTML = `
+        let serverIp = JSON.parse(params.params).__source;
+        let priority = params2.list.priority;
+        // let camId = params2.cam_id;
+        let camName = params.cam_name;
+
+        let watchlistName = params2.list.name;
+
+        let recognitionImgSrc = `http://${serverIp.split(":")[0]}:21093${params2.matched_person_face_image._links.source}`;
+        let watchlistImgSrc = `http://${serverIp.split(":")[0]}:21093${params2._links.detection_image}`;
+
+        let similarity = Number(params2.similarity).toFixed(2) * 100;
+        let personName = params2.person.first_name + " " + params2.person.middle_name + " " + params2.person.last_name;
+        let timestamp = convertUTCDate(params2.timestamp);
+
+        if (priority == 0) {
+            addNewRecognition = "recognition";
+        } else if (priority == 1) {
+            addNewRecognition = "info-recognition";
+        } else {
+            addNewRecognition = "white-recognition";
+        }
+
+        recognition = document.createElement("div");
+        recognition.innerHTML = `
             <div class="${addNewRecognition}">
                 <div class="software-images">
                     <div class="recognition-image">
@@ -55,7 +102,7 @@ ISScustomAPI.onEvent((type, id, action, params) => {
                     </div>
                 </div>
             
-                <div class="recognition-info">
+                <div class="recognition-info2">
                     
                     <div class="recognition-date">
                         <img src="css/assets/svg/icon-time.svg">
@@ -106,9 +153,10 @@ ISScustomAPI.onEvent((type, id, action, params) => {
                 </div>
             </div>
         `;
-    // document.write(priority);
-    var recognitionList = window.document.getElementById("recognition-list");
-    recognitionList.insertBefore(recognition, recognitionList.firstChild);
+        // document.write(priority);
+        var recognitionList = window.document.getElementById("recognition-list");
+        recognitionList.insertBefore(recognition, recognitionList.firstChild);
+    }
 });
 
 function convertUTCDate(facexDate) {

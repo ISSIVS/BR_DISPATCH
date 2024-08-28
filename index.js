@@ -68,6 +68,7 @@ app.post("/events", function (req, res) {
             req.body[0].state = "Novo";
             req.body[0].params = JSON.stringify(req.body[0].params);
             req.body[0].incident = incident || action;
+            logs.Write(`Event Received : ${JSON.stringify(req.body[0].params.comment)}`, "INFO", log_base_path);
             delete req.body[0].id;
 
             getObject(req.body[0], function (res) {
